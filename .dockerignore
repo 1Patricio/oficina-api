@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+.git
+.github
+.husky
+.env
+.env.*
+docs
+*.md
+src/generated
+**/__test__
+test

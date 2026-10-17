@@ -1,0 +1,67 @@
+{
+  "name": "oficina-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MVP do back-end do Sistema Integrado de Atendimento e Execução de Serviços de uma oficina mecânica (FIAP SOAT — Tech Challenge Fase 1).",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:ci": "biome ci .",
+    "prepare": "husky",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "dev": "nest start --watch"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.2.7",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.2.7",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.2.7",
+    "@nestjs/swagger": "^11.4.7",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@nestjs/cli": "^11.0.24",
+    "@nestjs/schematics": "^11.1.0",
+    "@nestjs/testing": "^11.2.7",
+    "@swc/core": "^1.16.18",
+    "@testcontainers/postgresql": "^12.2.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^4.1.11",
+    "dotenv": "^18.0.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prisma": "^7.10.0",
+    "supertest": "^7.3.1",
+    "typescript": "~5.9.3",
+    "unplugin-swc": "^1.6.0",
+    "vitest": "^4.1.11"
+  },
+  "overrides": {
+    "js-yaml": "^5.4.3",
+    "mysql2": "^3.23.1",
+    "deepmerge-ts": "^8.0.2"
+  }
+}

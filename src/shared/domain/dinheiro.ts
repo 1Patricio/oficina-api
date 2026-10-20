@@ -1,7 +1,9 @@
+import { DomainError } from './domain-error'
+
 export class Dinheiro {
   private constructor(readonly cents: number) {
     if (!Number.isSafeInteger(cents) || cents < 0) {
-      throw new Error(`Valor em centavos inválido: ${cents}`)
+      throw new DomainError('Valor inválido.')
     }
   }
 

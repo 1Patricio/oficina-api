@@ -36,6 +36,23 @@ describe('Material', () => {
     expect(() => criarFiltro(1.5)).toThrow(DomainError)
   })
 
+  it('restaura com o id e os dados informados', () => {
+    const id = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
+    const material = Material.restore(id, 'Filtro de óleo', preco, 5)
+    expect(material.id).toBe(id)
+    expect(material.nome).toBe('Filtro de óleo')
+    expect(material.precoUnitario.equals(preco)).toBe(true)
+    expect(material.estoque).toBe(5)
+  })
+
+  it('rejeita restaurar com dados inválidos', () => {
+    const id = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
+    expect(() => Material.restore(id, '  ', preco, 5)).toThrow(DomainError)
+    expect(() => Material.restore(id, 'Filtro de óleo', preco, -1)).toThrow(
+      DomainError,
+    )
+  })
+
   it('remove do estoque', () => {
     const material = criarFiltro(10)
     material.removeEstoque(3)

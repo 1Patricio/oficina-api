@@ -1,4 +1,5 @@
 import { Dinheiro } from '../dinheiro'
+import { DomainError } from '../domain-error'
 
 describe('Dinheiro', () => {
   it('guarda o valor em centavos', () => {
@@ -10,11 +11,11 @@ describe('Dinheiro', () => {
   })
 
   it('rejeita valor negativo', () => {
-    expect(() => Dinheiro.fromCents(-1)).toThrow()
+    expect(() => Dinheiro.fromCents(-1)).toThrow(DomainError)
   })
 
   it('rejeita fração de centavo', () => {
-    expect(() => Dinheiro.fromCents(10.5)).toThrow()
+    expect(() => Dinheiro.fromCents(10.5)).toThrow(DomainError)
   })
 
   it('soma dois valores', () => {

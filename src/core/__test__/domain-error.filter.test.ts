@@ -3,20 +3,20 @@ import { DomainError } from '../../shared/domain/domain-error'
 import { NotFoundError } from '../../shared/domain/not-found-error'
 import { DomainErrorFilter } from '../domain-error.filter'
 
-function criarContexto() {
+function createContext() {
   const response = { status: vi.fn(), json: vi.fn() }
   response.status.mockReturnValue(response)
-  const host = {
+  const context = {
     switchToHttp: () => ({ getResponse: () => response }),
   } as unknown as ArgumentsHost
-  return { response, host }
+  return { response, context }
 }
 
 describe('DomainErrorFilter', () => {
   it('responde 422 com a mensagem para um erro de domínio', () => {
-    const { response, host } = criarContexto()
+    const { response, context } = createContext()
 
-    new DomainErrorFilter().catch(new DomainError('Nome não informado.'), host)
+    new DomainErrorFilter().catch(new DomainError('Nome não informado.'), context)
 
     expect(response.status).toHaveBeenCalledWith(422)
     expect(response.json).toHaveBeenCalledWith({
@@ -27,12 +27,9 @@ describe('DomainErrorFilter', () => {
   })
 
   it('responde 404 com a mensagem para um erro de não encontrado', () => {
-    const { response, host } = criarContexto()
+    const { response, context } = createContext()
 
-    new DomainErrorFilter().catch(
-      new NotFoundError('Material não encontrado.'),
-      host,
-    )
+    new DomainErrorFilter().catch(new NotFoundError('Material não encontrado.'), context)
 
     expect(response.status).toHaveBeenCalledWith(404)
     expect(response.json).toHaveBeenCalledWith({

@@ -48,9 +48,7 @@ describe('Material', () => {
   it('rejeita restaurar com dados inválidos', () => {
     const id = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
     expect(() => Material.restore(id, '  ', preco, 5)).toThrow(DomainError)
-    expect(() => Material.restore(id, 'Filtro de óleo', preco, -1)).toThrow(
-      DomainError,
-    )
+    expect(() => Material.restore(id, 'Filtro de óleo', preco, -1)).toThrow(DomainError)
   })
 
   it('remove do estoque', () => {

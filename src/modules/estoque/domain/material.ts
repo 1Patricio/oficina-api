@@ -19,20 +19,11 @@ export class Material extends Entity {
     }
   }
 
-  static create(
-    nome: string,
-    precoUnitario: Dinheiro,
-    estoque: number,
-  ): Material {
+  static create(nome: string, precoUnitario: Dinheiro, estoque: number): Material {
     return new Material(randomUUID(), nome, precoUnitario, estoque)
   }
 
-  static restore(
-    id: string,
-    nome: string,
-    precoUnitario: Dinheiro,
-    estoque: number,
-  ): Material {
+  static restore(id: string, nome: string, precoUnitario: Dinheiro, estoque: number): Material {
     return new Material(id, nome, precoUnitario, estoque)
   }
 

@@ -11,6 +11,14 @@ export class Dinheiro {
     return new Dinheiro(cents)
   }
 
+  static fromReais(reais: number): Dinheiro {
+    const cents = Math.round(reais * 100)
+    if (Math.abs(reais * 100 - cents) > 1e-6) {
+      throw new DomainError('Valor inválido.')
+    }
+    return new Dinheiro(cents)
+  }
+
   add(other: Dinheiro): Dinheiro {
     return new Dinheiro(this.cents + other.cents)
   }

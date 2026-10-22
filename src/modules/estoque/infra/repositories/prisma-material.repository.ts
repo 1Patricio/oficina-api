@@ -33,7 +33,7 @@ export class PrismaMaterialRepository implements MaterialRepository {
       where: { nome: { contains: term, mode: 'insensitive' } },
       orderBy: { nome: 'asc' },
     })
-    return materiais.map(toDomain)
+    return materiais.map((material) => toDomain(material))
   }
 }
 

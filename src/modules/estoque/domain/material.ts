@@ -11,12 +11,8 @@ export class Material extends Entity {
     private _estoque: number,
   ) {
     super(id)
-    if (nome.trim() === '') {
-      throw new DomainError('Nome não informado.')
-    }
-    if (!Number.isSafeInteger(_estoque) || _estoque < 0) {
-      throw new DomainError('Estoque inválido.')
-    }
+    if (nome.trim() === '') throw new DomainError('Nome não informado.')
+    if (!Number.isSafeInteger(_estoque) || _estoque < 0) throw new DomainError('Estoque inválido.')
   }
 
   static create(nome: string, precoUnitario: Dinheiro, estoque: number): Material {

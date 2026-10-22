@@ -42,30 +42,26 @@ describe('CreateMaterial', () => {
   })
 
   it('rejeita nome vazio sem salvar', async () => {
-    await expect(
-      createMaterial.execute({ ...filtro, nome: '  ' }),
-    ).rejects.toThrow(DomainError)
+    await expect(createMaterial.execute({ ...filtro, nome: '  ' })).rejects.toThrow(DomainError)
     expect(repository.materiais).toHaveLength(0)
   })
 
   it('rejeita estoque negativo sem salvar', async () => {
-    await expect(
-      createMaterial.execute({ ...filtro, estoque: -1 }),
-    ).rejects.toThrow(DomainError)
+    await expect(createMaterial.execute({ ...filtro, estoque: -1 })).rejects.toThrow(DomainError)
     expect(repository.materiais).toHaveLength(0)
   })
 
   it('rejeita preço negativo sem salvar', async () => {
-    await expect(
-      createMaterial.execute({ ...filtro, precoUnitario: -1 }),
-    ).rejects.toThrow(DomainError)
+    await expect(createMaterial.execute({ ...filtro, precoUnitario: -1 })).rejects.toThrow(
+      DomainError,
+    )
     expect(repository.materiais).toHaveLength(0)
   })
 
   it('rejeita preço com mais de duas casas decimais sem salvar', async () => {
-    await expect(
-      createMaterial.execute({ ...filtro, precoUnitario: 45.905 }),
-    ).rejects.toThrow(DomainError)
+    await expect(createMaterial.execute({ ...filtro, precoUnitario: 45.905 })).rejects.toThrow(
+      DomainError,
+    )
     expect(repository.materiais).toHaveLength(0)
   })
 })

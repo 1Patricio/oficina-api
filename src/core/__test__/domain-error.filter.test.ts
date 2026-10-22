@@ -29,10 +29,7 @@ describe('DomainErrorFilter', () => {
   it('responde 404 com a mensagem para um erro de não encontrado', () => {
     const { response, host } = criarContexto()
 
-    new DomainErrorFilter().catch(
-      new NotFoundError('Material não encontrado.'),
-      host,
-    )
+    new DomainErrorFilter().catch(new NotFoundError('Material não encontrado.'), host)
 
     expect(response.status).toHaveBeenCalledWith(404)
     expect(response.json).toHaveBeenCalledWith({

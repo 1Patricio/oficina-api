@@ -41,9 +41,7 @@ describe('Dinheiro', () => {
 
   it('rejeita reais que não são número finito', () => {
     expect(() => Dinheiro.fromReais(Number.NaN)).toThrow(DomainError)
-    expect(() => Dinheiro.fromReais(Number.POSITIVE_INFINITY)).toThrow(
-      DomainError,
-    )
+    expect(() => Dinheiro.fromReais(Number.POSITIVE_INFINITY)).toThrow(DomainError)
   })
 
   it('soma dois valores', () => {

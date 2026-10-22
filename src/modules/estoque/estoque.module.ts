@@ -6,9 +6,6 @@ import { CreateMaterial } from './use-cases/create-material.use-case'
 
 @Module({
   controllers: [MateriaisController],
-  providers: [
-    { provide: MaterialRepository, useClass: PrismaMaterialRepository },
-    CreateMaterial,
-  ],
+  providers: [{ provide: MaterialRepository, useClass: PrismaMaterialRepository }, CreateMaterial],
 })
 export class EstoqueModule {}

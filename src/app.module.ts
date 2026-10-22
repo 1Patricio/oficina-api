@@ -7,11 +7,7 @@ import { PingController } from './core/ping.controller'
 import { EstoqueModule } from './modules/estoque/estoque.module'
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    EstoqueModule,
-    DatabaseModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), EstoqueModule, DatabaseModule],
   controllers: [PingController],
   providers: [
     { provide: APP_PIPE, useValue: new ValidationPipe({ whitelist: true }) },

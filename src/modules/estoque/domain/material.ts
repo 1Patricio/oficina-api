@@ -27,6 +27,15 @@ export class Material extends Entity {
     return new Material(randomUUID(), nome, precoUnitario, estoque)
   }
 
+  static restore(
+    id: string,
+    nome: string,
+    precoUnitario: Dinheiro,
+    estoque: number,
+  ): Material {
+    return new Material(id, nome, precoUnitario, estoque)
+  }
+
   get estoque(): number {
     return this._estoque
   }

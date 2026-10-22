@@ -1,0 +1,18 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Material {
+  id                    String @id @db.Uuid
+  nome                  String
+  precoUnitarioCentavos Int    @map("preco_unitario_centavos")
+  estoque               Int
+
+  @@map("materiais")
+}

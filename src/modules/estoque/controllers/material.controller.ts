@@ -3,7 +3,7 @@ import { CreateMaterial } from '../use-cases/create-material.use-case'
 import { CreateMaterialDTO } from './dtos/create-material.dto'
 
 @Controller('/materiais')
-export class MateriaisController {
+export class MaterialController {
   @Inject(CreateMaterial)
   private readonly createMaterial: CreateMaterial
 

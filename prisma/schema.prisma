@@ -16,3 +16,12 @@ model Material {
 
   @@map("materiais")
 }
+
+model Veiculo {
+  id     String @id @db.Uuid
+  ano    Int
+  marca  String
+  modelo String
+
+  @@map("veiculos")
+}

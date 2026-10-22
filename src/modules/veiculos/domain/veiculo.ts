@@ -17,4 +17,8 @@ export class Veiculo extends Entity {
   static create(ano: number, marca: string, modelo: string): Veiculo {
     return new Veiculo(randomUUID(), ano, marca, modelo)
   }
+
+  static restore(id: string, ano: number, marca: string, modelo: string): Veiculo {
+    return new Veiculo(id, ano, marca, modelo)
+  }
 }

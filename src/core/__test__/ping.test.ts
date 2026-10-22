@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../app.module'
+import { PrismaService } from '../database/prisma.service'
 
 describe('GET /ping', () => {
   let app: INestApplication
@@ -9,7 +10,10 @@ describe('GET /ping', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile()
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .compile()
 
     app = moduleRef.createNestApplication()
     await app.init()

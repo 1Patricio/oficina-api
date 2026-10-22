@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common'
 
-@Controller()
+@Controller('/ping')
 export class PingController {
-  @Get('ping')
+  @Get('/')
   ping() {
     return {
       status: 'ok',

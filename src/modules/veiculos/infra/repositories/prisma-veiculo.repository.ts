@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
 import type { VeiculoModel } from '../../../../generated/prisma/models'
+import { Placa } from '../../../../shared/domain/placa'
 import { VeiculoRepository } from '../../domain/repositories/veiculo.repository'
 import { Veiculo } from '../../domain/veiculo'
 
@@ -10,6 +11,7 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
 
   async save(veiculo: Veiculo): Promise<void> {
     const data = {
+      placa: veiculo.placa.value,
       ano: veiculo.ano,
       marca: veiculo.marca,
       modelo: veiculo.modelo,
@@ -44,5 +46,11 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
 }
 
 function toDomain(veiculo: VeiculoModel): Veiculo {
-  return Veiculo.restore(veiculo.id, veiculo.ano, veiculo.marca, veiculo.modelo)
+  return Veiculo.restore(
+    veiculo.id,
+    Placa.create(veiculo.placa),
+    veiculo.ano,
+    veiculo.marca,
+    veiculo.modelo,
+  )
 }

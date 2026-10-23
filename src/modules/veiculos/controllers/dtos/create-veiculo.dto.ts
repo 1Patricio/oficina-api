@@ -1,6 +1,9 @@
 import { IsNumber, IsString } from 'class-validator'
 
 export class CreateVeiculoDTO {
+  @IsString()
+  placa: string
+
   @IsNumber()
   ano: number
 

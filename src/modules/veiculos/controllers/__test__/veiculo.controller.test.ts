@@ -7,6 +7,7 @@ import { InMemoryVeiculoRepository } from '../../__test__/double/in-memory-veicu
 import { VeiculoRepository } from '../../domain/repositories/veiculo.repository'
 
 const fakeVeiculo = {
+  placa: 'ABC1234',
   ano: 2010,
   marca: 'Volkswagen',
   modelo: 'Gol',

@@ -1,3 +1,4 @@
+import { Documento } from '../../../../shared/domain/documento'
 import { Cliente } from '../../domain/cliente'
 import { ClienteRepository } from '../../domain/repositories/cliente.repository'
 
@@ -15,5 +16,10 @@ export class InMemoryClienteRepository extends ClienteRepository {
 
   findById(id: string): Promise<Cliente | null> {
     return Promise.resolve(this.itens.get(id) ?? null)
+  }
+
+  findByDocumento(documento: Documento): Promise<Cliente | null> {
+    const cliente = this.clientes.find((item) => item.documento.equals(documento))
+    return Promise.resolve(cliente ?? null)
   }
 }

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { ConflictError } from '../../../shared/domain/conflict-error'
 import { Documento } from '../../../shared/domain/documento'
 import { Cliente } from '../domain/cliente'
 import { ClienteRepository } from '../domain/repositories/cliente.repository'
@@ -18,6 +19,9 @@ export class CreateCliente {
 
   async execute({ documento, nome }: Request): Promise<Response> {
     const cliente = Cliente.create(Documento.create(documento), nome)
+    if (await this.clienteRepository.findByDocumento(cliente.documento)) {
+      throw new ConflictError('Cliente já cadastrado.')
+    }
     await this.clienteRepository.save(cliente)
     return { id: cliente.id }
   }

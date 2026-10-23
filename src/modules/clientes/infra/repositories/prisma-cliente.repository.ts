@@ -26,6 +26,11 @@ export class PrismaClienteRepository implements ClienteRepository {
     const cliente = await this.prisma.cliente.findUnique({ where: { id } })
     return cliente ? toDomain(cliente) : null
   }
+
+  async findByDocumento(documento: Documento): Promise<Cliente | null> {
+    const cliente = await this.prisma.cliente.findUnique({ where: { documento: documento.value } })
+    return cliente ? toDomain(cliente) : null
+  }
 }
 
 function toDomain(cliente: ClienteModel): Cliente {

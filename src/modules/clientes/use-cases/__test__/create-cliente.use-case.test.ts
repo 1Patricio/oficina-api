@@ -1,3 +1,4 @@
+import { ConflictError } from '../../../../shared/domain/conflict-error'
 import { DomainError } from '../../../../shared/domain/domain-error'
 import { InMemoryClienteRepository } from '../../__test__/double/in-memory-cliente.repository'
 import { CreateCliente } from '../create-cliente.use-case'
@@ -29,6 +30,13 @@ describe('CreateCliente', () => {
       createCliente.execute({ ...fakeCliente, documento: '123.456.789-00' }),
     ).rejects.toThrow(DomainError)
     expect(repository.clientes).toHaveLength(0)
+  })
+
+  it('rejeita documento já cadastrado sem salvar outro cliente', async () => {
+    await createCliente.execute(fakeCliente)
+
+    await expect(createCliente.execute(fakeCliente)).rejects.toThrow(ConflictError)
+    expect(repository.clientes).toHaveLength(1)
   })
 
   it('rejeita nome vazio sem salvar', async () => {

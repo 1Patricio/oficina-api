@@ -26,3 +26,11 @@ model Veiculo {
 
   @@map("veiculos")
 }
+
+model Cliente {
+  id        String @id @db.Uuid
+  documento String @unique
+  nome      String
+
+  @@map("clientes")
+}

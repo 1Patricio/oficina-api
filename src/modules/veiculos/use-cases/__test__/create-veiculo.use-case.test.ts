@@ -3,6 +3,7 @@ import { InMemoryVeiculoRepository } from '../../__test__/double/in-memory-veicu
 import { CreateVeiculo } from '../create-veiculo.use-case'
 
 const fakeVeiculo = {
+  placa: 'ABC1234',
   ano: 2010,
   marca: 'Volkswagen',
   modelo: 'Gol',
@@ -21,9 +22,17 @@ describe('CreateVeiculo', () => {
     const { id } = await createVeiculo.execute(fakeVeiculo)
 
     const salvo = await repository.findById(id)
+    expect(salvo?.placa.value).toBe('ABC1234')
     expect(salvo?.ano).toBe(2010)
     expect(salvo?.marca).toBe('Volkswagen')
     expect(salvo?.modelo).toBe('Gol')
+  })
+
+  it('rejeita placa inválida sem salvar', async () => {
+    await expect(createVeiculo.execute({ ...fakeVeiculo, placa: 'ABC123' })).rejects.toThrow(
+      DomainError,
+    )
+    expect(repository.veiculos).toHaveLength(0)
   })
 
   it('rejeita marca vazia sem salvar', async () => {

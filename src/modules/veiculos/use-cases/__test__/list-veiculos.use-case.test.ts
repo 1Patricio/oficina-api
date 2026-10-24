@@ -15,7 +15,16 @@ describe('ListVeiculos', () => {
       page: 1,
       rpp: 20,
       more: false,
-      list: [{ id: gol.id, placa: 'ABC1234', ano: 2010, marca: 'Volkswagen', modelo: 'Gol' }],
+      list: [
+        {
+          id: gol.id,
+          placa: 'ABC1234',
+          ano: 2010,
+          marca: 'Volkswagen',
+          modelo: 'Gol',
+          clienteId: null,
+        },
+      ],
     })
   })
 })

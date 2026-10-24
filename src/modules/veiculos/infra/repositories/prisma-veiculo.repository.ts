@@ -16,6 +16,7 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
       ano: veiculo.ano,
       marca: veiculo.marca,
       modelo: veiculo.modelo,
+      clienteId: veiculo.clienteId,
     }
 
     await this.prisma.veiculo.upsert({
@@ -60,5 +61,6 @@ function toDomain(veiculo: VeiculoModel): Veiculo {
     veiculo.ano,
     veiculo.marca,
     veiculo.modelo,
+    veiculo.clienteId,
   )
 }

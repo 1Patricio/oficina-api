@@ -14,6 +14,7 @@ type Response = {
   ano: number
   marca: string
   modelo: string
+  clienteId: string | null
 }
 
 @Injectable()
@@ -28,6 +29,7 @@ export class ListVeiculos {
       ano: veiculo.ano,
       marca: veiculo.marca,
       modelo: veiculo.modelo,
+      clienteId: veiculo.clienteId,
     }))
   }
 }

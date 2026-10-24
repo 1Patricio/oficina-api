@@ -13,8 +13,9 @@ describe('GetVeiculo', () => {
     getVeiculo = new GetVeiculo(repository)
   })
 
-  it('devolve o veículo com a placa em texto', async () => {
-    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol')
+  it('devolve o veículo com a placa em texto e o cliente vinculado', async () => {
+    const clienteId = '9c3aea20-5c38-4162-84d9-4e67f461997f'
+    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol', clienteId)
     await repository.save(gol)
 
     const veiculo = await getVeiculo.execute({ veiculoId: gol.id })
@@ -25,6 +26,7 @@ describe('GetVeiculo', () => {
       ano: 2010,
       marca: 'Volkswagen',
       modelo: 'Gol',
+      clienteId,
     })
   })
 

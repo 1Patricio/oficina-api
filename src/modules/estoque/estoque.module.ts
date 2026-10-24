@@ -12,5 +12,6 @@ import { ListMateriais } from './use-cases/list-materiais.use-case'
     CreateMaterial,
     ListMateriais,
   ],
+  exports: [MaterialRepository],
 })
 export class EstoqueModule {}

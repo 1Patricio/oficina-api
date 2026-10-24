@@ -4,6 +4,7 @@ import { ServicoController } from './controllers/servico.controller'
 import { ServicoRepository } from './domain/repositories/servico.repository'
 import { PrismaServicoRepository } from './infra/repositories/prisma-servico.repository'
 import { CreateServico } from './use-cases/create-servico.use-case'
+import { GetServico } from './use-cases/get-servico.use-case'
 import { ListServicos } from './use-cases/list-servicos.use-case'
 
 @Module({
@@ -13,6 +14,7 @@ import { ListServicos } from './use-cases/list-servicos.use-case'
     { provide: ServicoRepository, useClass: PrismaServicoRepository },
     CreateServico,
     ListServicos,
+    GetServico,
   ],
 })
 export class ServicoModule {}

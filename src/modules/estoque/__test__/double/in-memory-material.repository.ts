@@ -1,3 +1,4 @@
+import { Page } from '../../../../shared/domain/page'
 import { Material } from '../../domain/material'
 import { MaterialRepository } from '../../domain/repositories/material.repository'
 
@@ -17,7 +18,8 @@ export class InMemoryMaterialRepository extends MaterialRepository {
     return Promise.resolve(this.itens.get(id) ?? null)
   }
 
-  list(): Promise<Material[]> {
-    return Promise.resolve(this.materiais)
+  list(page: number, rpp: number): Promise<Page<Material>> {
+    const list = this.materiais.slice((page - 1) * rpp, page * rpp + 1)
+    return Promise.resolve(Page.create({ page, rpp, list }))
   }
 }

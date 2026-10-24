@@ -3,7 +3,9 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { InMemoryMaterialRepository } from '../../__test__/double/in-memory-material.repository'
+import { Material } from '../../domain/material'
 import { MaterialRepository } from '../../domain/repositories/material.repository'
 
 const fakeMaterial = {
@@ -83,5 +85,60 @@ describe('POST /materiais', () => {
     expect(response.status).toBe(422)
     expect(response.body.message).toBe('Nome não informado.')
     expect(repository.materiais).toHaveLength(0)
+  })
+})
+
+describe('GET /materiais', () => {
+  let app: INestApplication
+  let repository: InMemoryMaterialRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryMaterialRepository()
+    await repository.save(Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10))
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(MaterialRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com a primeira página quando não há parâmetros', async () => {
+    const response = await request(app.getHttpServer()).get('/materiais')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toMatchObject({ page: 1, rpp: 20, more: false })
+    expect(response.body.list).toHaveLength(1)
+  })
+
+  it('responde 200 com a página pedida e o preço em reais', async () => {
+    const oleo = Material.create('Óleo 5W30', Dinheiro.fromCents(3500), 5)
+    await repository.save(oleo)
+
+    const response = await request(app.getHttpServer()).get('/materiais').query({ page: 2, rpp: 1 })
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      page: 2,
+      rpp: 1,
+      more: false,
+      list: [{ id: oleo.id, nome: 'Óleo 5W30', precoUnitario: 35, estoque: 5 }],
+    })
+  })
+
+  it('responde 400 quando rpp passa do limite', async () => {
+    const response = await request(app.getHttpServer()).get('/materiais').query({ rpp: 101 })
+
+    expect(response.status).toBe(400)
   })
 })

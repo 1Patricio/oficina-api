@@ -27,6 +27,10 @@ describe('Dinheiro', () => {
     expect(Dinheiro.fromReais(0.1 + 0.2).cents).toBe(30)
   })
 
+  it('converte centavos em reais', () => {
+    expect(Dinheiro.fromCents(4590).reais).toBe(45.9)
+  })
+
   it('aceita zero reais', () => {
     expect(Dinheiro.fromReais(0).cents).toBe(0)
   })

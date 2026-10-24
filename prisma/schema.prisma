@@ -14,6 +14,8 @@ model Material {
   precoUnitarioCentavos Int    @map("preco_unitario_centavos")
   estoque               Int
 
+  servicos ServicoMaterial[]
+
   @@map("materiais")
 }
 
@@ -33,4 +35,27 @@ model Cliente {
   nome      String
 
   @@map("clientes")
+}
+
+model Servico {
+  id            String @id @db.Uuid
+  nome          String
+  descricao     String
+  precoCentavos Int    @map("preco_centavos")
+
+  materiais ServicoMaterial[]
+
+  @@map("servicos")
+}
+
+model ServicoMaterial {
+  servicoId  String @map("servico_id") @db.Uuid
+  materialId String @map("material_id") @db.Uuid
+  quantidade Int
+
+  servico  Servico  @relation(fields: [servicoId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id])
+
+  @@id([servicoId, materialId])
+  @@map("servico_materiais")
 }

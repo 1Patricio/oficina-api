@@ -6,6 +6,7 @@ import { DomainErrorFilter } from './core/domain-error.filter'
 import { PingController } from './core/ping.controller'
 import { ClienteModule } from './modules/clientes/cliente.module'
 import { EstoqueModule } from './modules/estoque/estoque.module'
+import { ServicoModule } from './modules/servicos/servico.module'
 import { VeiculoModule } from './modules/veiculos/veiculo.module'
 
 @Module({
@@ -15,6 +16,7 @@ import { VeiculoModule } from './modules/veiculos/veiculo.module'
     ClienteModule,
     EstoqueModule,
     VeiculoModule,
+    ServicoModule,
   ],
   controllers: [PingController],
   providers: [

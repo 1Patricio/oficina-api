@@ -87,3 +87,47 @@ describe('GET /clientes', () => {
     })
   })
 })
+
+describe('GET /clientes/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryClienteRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryClienteRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(ClienteRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com o cliente e o documento em texto', async () => {
+    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    await repository.save(maria)
+
+    const response = await request(app.getHttpServer()).get(`/clientes/${maria.id}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ id: maria.id, nome: 'Maria Silva', documento: '52998224725' })
+  })
+
+  it('responde 404 quando o cliente não existe', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/clientes/6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
+    )
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('Cliente não encontrado.')
+  })
+})

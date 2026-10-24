@@ -19,6 +19,10 @@ export class Dinheiro {
     return new Dinheiro(cents)
   }
 
+  get reais(): number {
+    return this.cents / 100
+  }
+
   add(other: Dinheiro): Dinheiro {
     return new Dinheiro(this.cents + other.cents)
   }

@@ -132,3 +132,53 @@ describe('GET /servicos', () => {
     })
   })
 })
+
+describe('GET /servicos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(ServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com o serviço e o preço em reais', async () => {
+    const troca = Servico.create('Troca de óleo', 'Troca com 1L de óleo', preco)
+    await repository.save(troca)
+
+    const response = await request(app.getHttpServer()).get(`/servicos/${troca.id}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      id: troca.id,
+      nome: 'Troca de óleo',
+      descricao: 'Troca com 1L de óleo',
+      preco: 150,
+      materiais: [],
+    })
+  })
+
+  it('responde 404 quando o serviço não existe', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/servicos/6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
+    )
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('Serviço não encontrado.')
+  })
+})

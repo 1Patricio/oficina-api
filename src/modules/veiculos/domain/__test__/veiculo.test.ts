@@ -12,6 +12,15 @@ describe('Veiculo', () => {
     expect(veiculo.modelo).toBe('Gol')
   })
 
+  it('cria sem cliente por padrão', () => {
+    expect(Veiculo.create(placa, 2010, 'Volkswagen', 'Gol').clienteId).toBeNull()
+  })
+
+  it('cria vinculado ao cliente informado', () => {
+    const clienteId = '9c3aea20-5c38-4162-84d9-4e67f461997f'
+    expect(Veiculo.create(placa, 2010, 'Volkswagen', 'Gol', clienteId).clienteId).toBe(clienteId)
+  })
+
   it('gera um id diferente para cada veículo', () => {
     const primeiro = Veiculo.create(placa, 2010, 'Volkswagen', 'Gol')
     const segundo = Veiculo.create(placa, 2010, 'Volkswagen', 'Gol')

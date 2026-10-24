@@ -10,17 +10,31 @@ export class Veiculo extends Entity {
     readonly ano: number,
     readonly marca: string,
     readonly modelo: string,
+    readonly clienteId: string | null,
   ) {
     super(id)
     if (marca.trim() === '') throw new DomainError('Marca não informada.')
     if (modelo.trim() === '') throw new DomainError('Modelo não informado.')
   }
 
-  static create(placa: Placa, ano: number, marca: string, modelo: string): Veiculo {
-    return new Veiculo(randomUUID(), placa, ano, marca, modelo)
+  static create(
+    placa: Placa,
+    ano: number,
+    marca: string,
+    modelo: string,
+    clienteId: string | null = null,
+  ): Veiculo {
+    return new Veiculo(randomUUID(), placa, ano, marca, modelo, clienteId)
   }
 
-  static restore(id: string, placa: Placa, ano: number, marca: string, modelo: string): Veiculo {
-    return new Veiculo(id, placa, ano, marca, modelo)
+  static restore(
+    id: string,
+    placa: Placa,
+    ano: number,
+    marca: string,
+    modelo: string,
+    clienteId: string | null = null,
+  ): Veiculo {
+    return new Veiculo(id, placa, ano, marca, modelo, clienteId)
   }
 }

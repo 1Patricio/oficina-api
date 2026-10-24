@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator'
+import { IsNumber, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class CreateVeiculoDTO {
   @IsString()
@@ -12,4 +12,8 @@ export class CreateVeiculoDTO {
 
   @IsString()
   modelo: string
+
+  @IsOptional()
+  @IsUUID()
+  clienteId?: string
 }

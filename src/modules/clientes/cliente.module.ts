@@ -14,5 +14,6 @@ import { ListClientes } from './use-cases/list-clientes.use-case'
     ListClientes,
     GetCliente,
   ],
+  exports: [ClienteRepository],
 })
 export class ClienteModule {}

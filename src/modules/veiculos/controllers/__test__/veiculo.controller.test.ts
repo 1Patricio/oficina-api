@@ -129,3 +129,53 @@ describe('GET /veiculos', () => {
     })
   })
 })
+
+describe('GET /veiculos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryVeiculoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryVeiculoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(VeiculoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com o veículo e a placa em texto', async () => {
+    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol')
+    await repository.save(gol)
+
+    const response = await request(app.getHttpServer()).get(`/veiculos/${gol.id}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      id: gol.id,
+      placa: 'ABC1234',
+      ano: 2010,
+      marca: 'Volkswagen',
+      modelo: 'Gol',
+    })
+  })
+
+  it('responde 404 quando o veículo não existe', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/veiculos/6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
+    )
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('Veículo não encontrado.')
+  })
+})

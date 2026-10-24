@@ -9,6 +9,9 @@ import { Material } from '../../../estoque/domain/material'
 import { MaterialRepository } from '../../../estoque/domain/repositories/material.repository'
 import { InMemoryServicoRepository } from '../../__test__/double/in-memory-servico.repository'
 import { ServicoRepository } from '../../domain/repositories/servico.repository'
+import { Servico } from '../../domain/servico'
+
+const preco = Dinheiro.fromCents(15000)
 
 describe('POST /servicos', () => {
   let app: INestApplication
@@ -78,5 +81,54 @@ describe('POST /servicos', () => {
     expect(response.status).toBe(404)
     expect(response.body.message).toBe('Material não encontrado.')
     expect(repository.servicos).toHaveLength(0)
+  })
+})
+
+describe('GET /servicos', () => {
+  let app: INestApplication
+  let repository: InMemoryServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(ServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com a página pedida e o preço em reais', async () => {
+    await repository.save(Servico.create('Alinhamento', 'Alinhamento das rodas', preco))
+    const troca = Servico.create('Troca de óleo', 'Troca com 1L de óleo', preco)
+    await repository.save(troca)
+
+    const response = await request(app.getHttpServer()).get('/servicos').query({ page: 2, rpp: 1 })
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      page: 2,
+      rpp: 1,
+      more: false,
+      list: [
+        {
+          id: troca.id,
+          nome: 'Troca de óleo',
+          descricao: 'Troca com 1L de óleo',
+          preco: 150,
+          materiais: [],
+        },
+      ],
+    })
   })
 })

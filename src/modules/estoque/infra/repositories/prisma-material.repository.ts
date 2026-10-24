@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
 import type { MaterialModel } from '../../../../generated/prisma/models'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
+import { Page } from '../../../../shared/domain/page'
 import { Material } from '../../domain/material'
 import { MaterialRepository } from '../../domain/repositories/material.repository'
 
@@ -28,12 +29,14 @@ export class PrismaMaterialRepository implements MaterialRepository {
     return material ? toDomain(material) : null
   }
 
-  async list(term?: string): Promise<Material[]> {
+  async list(page: number, rpp: number, term?: string): Promise<Page<Material>> {
     const materiais = await this.prisma.material.findMany({
       where: { nome: { contains: term, mode: 'insensitive' } },
       orderBy: { nome: 'asc' },
+      skip: (page - 1) * rpp,
+      take: rpp + 1,
     })
-    return materiais.map((material) => toDomain(material))
+    return Page.create({ page, rpp, list: materiais.map((material) => toDomain(material)) })
   }
 }
 

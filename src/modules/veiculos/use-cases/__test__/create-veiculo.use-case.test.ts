@@ -1,3 +1,4 @@
+import { ConflictError } from '../../../../shared/domain/conflict-error'
 import { DomainError } from '../../../../shared/domain/domain-error'
 import { InMemoryVeiculoRepository } from '../../__test__/double/in-memory-veiculo.repository'
 import { CreateVeiculo } from '../create-veiculo.use-case'
@@ -33,6 +34,13 @@ describe('CreateVeiculo', () => {
       DomainError,
     )
     expect(repository.veiculos).toHaveLength(0)
+  })
+
+  it('rejeita placa já cadastrada sem salvar outro veículo', async () => {
+    await createVeiculo.execute(fakeVeiculo)
+
+    await expect(createVeiculo.execute(fakeVeiculo)).rejects.toThrow(ConflictError)
+    expect(repository.veiculos).toHaveLength(1)
   })
 
   it('rejeita marca vazia sem salvar', async () => {

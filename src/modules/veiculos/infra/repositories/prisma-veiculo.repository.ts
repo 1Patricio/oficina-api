@@ -29,6 +29,11 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
     return veiculo ? toDomain(veiculo) : null
   }
 
+  async findByPlaca(placa: Placa): Promise<Veiculo | null> {
+    const veiculo = await this.prisma.veiculo.findUnique({ where: { placa: placa.value } })
+    return veiculo ? toDomain(veiculo) : null
+  }
+
   async list(term?: string): Promise<Veiculo[]> {
     const veiculos = await this.prisma.veiculo.findMany({
       where: term

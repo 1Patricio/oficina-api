@@ -1,3 +1,4 @@
+import { Page } from '../../../../shared/domain/page'
 import type { Placa } from '../../../../shared/domain/placa'
 import { VeiculoRepository } from '../../domain/repositories/veiculo.repository'
 import { Veiculo } from '../../domain/veiculo'
@@ -23,7 +24,8 @@ export class InMemoryVeiculoRepository extends VeiculoRepository {
     return Promise.resolve(veiculo ?? null)
   }
 
-  list(): Promise<Veiculo[]> {
-    return Promise.resolve(this.veiculos)
+  list(page: number, rpp: number): Promise<Page<Veiculo>> {
+    const list = this.veiculos.slice((page - 1) * rpp, page * rpp + 1)
+    return Promise.resolve(Page.create({ page, rpp, list }))
   }
 }

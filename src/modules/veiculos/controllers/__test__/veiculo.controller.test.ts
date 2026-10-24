@@ -3,8 +3,10 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { Placa } from '../../../../shared/domain/placa'
 import { InMemoryVeiculoRepository } from '../../__test__/double/in-memory-veiculo.repository'
 import { VeiculoRepository } from '../../domain/repositories/veiculo.repository'
+import { Veiculo } from '../../domain/veiculo'
 
 const fakeVeiculo = {
   placa: 'ABC1234',
@@ -84,5 +86,46 @@ describe('POST /veiculos', () => {
     expect(response.status).toBe(422)
     expect(response.body.message).toBe('Modelo não informado.')
     expect(repository.veiculos).toHaveLength(0)
+  })
+})
+
+describe('GET /veiculos', () => {
+  let app: INestApplication
+  let repository: InMemoryVeiculoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryVeiculoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(VeiculoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com a página pedida e a placa em texto', async () => {
+    await repository.save(Veiculo.create(Placa.create('DEF5678'), 2015, 'Fiat', 'Uno'))
+    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol')
+    await repository.save(gol)
+
+    const response = await request(app.getHttpServer()).get('/veiculos').query({ page: 2, rpp: 1 })
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      page: 2,
+      rpp: 1,
+      more: false,
+      list: [{ id: gol.id, placa: 'ABC1234', ano: 2010, marca: 'Volkswagen', modelo: 'Gol' }],
+    })
   })
 })

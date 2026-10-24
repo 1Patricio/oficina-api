@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
 import type { VeiculoModel } from '../../../../generated/prisma/models'
+import { Page } from '../../../../shared/domain/page'
 import { Placa } from '../../../../shared/domain/placa'
 import { VeiculoRepository } from '../../domain/repositories/veiculo.repository'
 import { Veiculo } from '../../domain/veiculo'
@@ -34,7 +35,7 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
     return veiculo ? toDomain(veiculo) : null
   }
 
-  async list(term?: string): Promise<Veiculo[]> {
+  async list(page: number, rpp: number, term?: string): Promise<Page<Veiculo>> {
     const veiculos = await this.prisma.veiculo.findMany({
       where: term
         ? {
@@ -45,8 +46,10 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
           }
         : undefined,
       orderBy: [{ marca: 'asc' }, { modelo: 'asc' }],
+      skip: (page - 1) * rpp,
+      take: rpp + 1,
     })
-    return veiculos.map((veiculo) => toDomain(veiculo))
+    return Page.create({ page, rpp, list: veiculos.map((veiculo) => toDomain(veiculo)) })
   }
 }
 

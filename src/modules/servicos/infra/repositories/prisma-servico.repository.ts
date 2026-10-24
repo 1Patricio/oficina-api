@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
 import type { ServicoMaterialModel, ServicoModel } from '../../../../generated/prisma/models'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
+import { Page } from '../../../../shared/domain/page'
 import { MaterialNecessario } from '../../domain/material-necessario'
 import { ServicoRepository } from '../../domain/repositories/servico.repository'
 import { Servico } from '../../domain/servico'
@@ -37,13 +38,15 @@ export class PrismaServicoRepository implements ServicoRepository {
     return servico ? toDomain(servico) : null
   }
 
-  async list(term?: string): Promise<Servico[]> {
+  async list(page: number, rpp: number, term?: string): Promise<Page<Servico>> {
     const servicos = await this.prisma.servico.findMany({
       where: { nome: { contains: term, mode: 'insensitive' } },
       include: { materiais: true },
       orderBy: { nome: 'asc' },
+      skip: (page - 1) * rpp,
+      take: rpp + 1,
     })
-    return servicos.map((servico) => toDomain(servico))
+    return Page.create({ page, rpp, list: servicos.map((servico) => toDomain(servico)) })
   }
 }
 

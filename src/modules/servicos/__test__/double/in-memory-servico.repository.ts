@@ -1,3 +1,4 @@
+import { Page } from '../../../../shared/domain/page'
 import { ServicoRepository } from '../../domain/repositories/servico.repository'
 import { Servico } from '../../domain/servico'
 
@@ -17,7 +18,8 @@ export class InMemoryServicoRepository extends ServicoRepository {
     return Promise.resolve(this.itens.get(id) ?? null)
   }
 
-  list(): Promise<Servico[]> {
-    return Promise.resolve(this.servicos)
+  list(page: number, rpp: number): Promise<Page<Servico>> {
+    const list = this.servicos.slice((page - 1) * rpp, page * rpp + 1)
+    return Promise.resolve(Page.create({ page, rpp, list }))
   }
 }

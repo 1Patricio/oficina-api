@@ -111,7 +111,7 @@ describe('OrdemServico', () => {
 
     ordem.aprovarOrcamento(dataResposta)
 
-    expect(ordem.status).toBe(StatusOrdemServico.EM_EXECUCAO)
+    expect(ordem.status).toBe(StatusOrdemServico.EXECUCAO)
     expect(ordem.dataInicio).toBe(dataResposta)
     expect(ordem.orcamentos[0]).toMatchObject({ status: StatusOrcamento.APROVADO, dataResposta })
   })
@@ -121,7 +121,7 @@ describe('OrdemServico', () => {
 
     ordem.rejeitarOrcamento(dataResposta)
 
-    expect(ordem.status).toBe(StatusOrdemServico.EM_DIAGNOSTICO)
+    expect(ordem.status).toBe(StatusOrdemServico.DIAGNOSTICO)
     expect(ordem.dataInicio).toBeNull()
     expect(ordem.orcamentos[0]).toMatchObject({ status: StatusOrcamento.REJEITADO, dataResposta })
   })
@@ -150,13 +150,13 @@ describe('OrdemServico', () => {
     const ordem = novaOrdem()
 
     ordem.iniciarDiagnostico()
-    expect(ordem.status).toBe(StatusOrdemServico.EM_DIAGNOSTICO)
+    expect(ordem.status).toBe(StatusOrdemServico.DIAGNOSTICO)
 
     ordem.enviarOrcamento(dataEnvio)
     expect(ordem.status).toBe(StatusOrdemServico.AGUARDANDO_APROVACAO)
 
     ordem.aprovarOrcamento(dataResposta)
-    expect(ordem.status).toBe(StatusOrdemServico.EM_EXECUCAO)
+    expect(ordem.status).toBe(StatusOrdemServico.EXECUCAO)
 
     ordem.finalizar(dataFinalizacao)
     expect(ordem.status).toBe(StatusOrdemServico.FINALIZADA)
@@ -184,7 +184,7 @@ describe('OrdemServico', () => {
       id,
       clienteId,
       veiculoId,
-      status: StatusOrdemServico.EM_EXECUCAO,
+      status: StatusOrdemServico.EXECUCAO,
       dataRecebimento,
       dataInicio: dataResposta,
       dataFinalizacao: null,
@@ -198,7 +198,7 @@ describe('OrdemServico', () => {
       id,
       clienteId,
       veiculoId,
-      status: StatusOrdemServico.EM_EXECUCAO,
+      status: StatusOrdemServico.EXECUCAO,
       dataRecebimento,
       dataInicio: dataResposta,
       dataFinalizacao: null,

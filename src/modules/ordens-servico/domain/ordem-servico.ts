@@ -118,11 +118,11 @@ export class OrdemServico extends Entity {
 
   iniciarDiagnostico(): void {
     this.exigirStatus(StatusOrdemServico.RECEBIDA)
-    this._status = StatusOrdemServico.EM_DIAGNOSTICO
+    this._status = StatusOrdemServico.DIAGNOSTICO
   }
 
   enviarOrcamento(data: Date = new Date()): void {
-    this.exigirStatus(StatusOrdemServico.EM_DIAGNOSTICO)
+    this.exigirStatus(StatusOrdemServico.DIAGNOSTICO)
     if (this._servicos.length === 0) throw new DomainError('Informe ao menos um serviço.')
     this._orcamentos.push(Orcamento.enviar(this.total, data))
     this._status = StatusOrdemServico.AGUARDANDO_APROVACAO
@@ -132,17 +132,17 @@ export class OrdemServico extends Entity {
     this.exigirStatus(StatusOrdemServico.AGUARDANDO_APROVACAO)
     this.responderOrcamento((orcamento) => orcamento.aprovar(data))
     this._dataInicio = data
-    this._status = StatusOrdemServico.EM_EXECUCAO
+    this._status = StatusOrdemServico.EXECUCAO
   }
 
   rejeitarOrcamento(data: Date = new Date()): void {
     this.exigirStatus(StatusOrdemServico.AGUARDANDO_APROVACAO)
     this.responderOrcamento((orcamento) => orcamento.rejeitar(data))
-    this._status = StatusOrdemServico.EM_DIAGNOSTICO
+    this._status = StatusOrdemServico.DIAGNOSTICO
   }
 
   finalizar(data: Date = new Date()): void {
-    this.exigirStatus(StatusOrdemServico.EM_EXECUCAO)
+    this.exigirStatus(StatusOrdemServico.EXECUCAO)
     this._dataFinalizacao = data
     this._status = StatusOrdemServico.FINALIZADA
   }
@@ -165,7 +165,7 @@ export class OrdemServico extends Entity {
   private exigirItensEditaveis(): void {
     const editavel =
       this._status === StatusOrdemServico.RECEBIDA ||
-      this._status === StatusOrdemServico.EM_DIAGNOSTICO
+      this._status === StatusOrdemServico.DIAGNOSTICO
     if (!editavel) {
       throw new DomainError('Itens não podem ser alterados após o envio do orçamento.')
     }

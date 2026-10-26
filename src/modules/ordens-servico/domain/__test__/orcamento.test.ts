@@ -39,4 +39,15 @@ describe('Orcamento', () => {
 
     expect(() => aprovado.rejeitar(dataResposta)).toThrow(DomainError)
   })
+
+  it('restaura um orçamento já respondido sem passar pelas transições', () => {
+    const orcamento = Orcamento.restore(valor, StatusOrcamento.APROVADO, dataEnvio, dataResposta)
+
+    expect(orcamento).toMatchObject({
+      valor,
+      status: StatusOrcamento.APROVADO,
+      dataEnvio,
+      dataResposta,
+    })
+  })
 })

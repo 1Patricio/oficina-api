@@ -14,6 +14,15 @@ export class Orcamento {
     return new Orcamento(valor, StatusOrcamento.PENDENTE, dataEnvio, null)
   }
 
+  static restore(
+    valor: Dinheiro,
+    status: StatusOrcamento,
+    dataEnvio: Date,
+    dataResposta: Date | null,
+  ): Orcamento {
+    return new Orcamento(valor, status, dataEnvio, dataResposta)
+  }
+
   aprovar(dataResposta: Date): Orcamento {
     return this.responder(StatusOrcamento.APROVADO, dataResposta)
   }

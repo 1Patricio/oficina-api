@@ -7,6 +7,20 @@ import type { ItemServico } from './item-servico'
 import { Orcamento } from './orcamento'
 import { StatusOrdemServico } from './status-ordem-servico'
 
+type RestoreProps = {
+  id: string
+  clienteId: string
+  veiculoId: string
+  status: StatusOrdemServico
+  dataRecebimento: Date
+  dataInicio: Date | null
+  dataFinalizacao: Date | null
+  dataEntrega: Date | null
+  servicos: ItemServico[]
+  materiais: ItemMaterial[]
+  orcamentos: Orcamento[]
+}
+
 export class OrdemServico extends Entity {
   private _status: StatusOrdemServico = StatusOrdemServico.RECEBIDA
   private readonly _servicos: ItemServico[] = []
@@ -31,6 +45,23 @@ export class OrdemServico extends Entity {
     dataRecebimento: Date = new Date(),
   ): OrdemServico {
     return new OrdemServico(randomUUID(), clienteId, veiculoId, dataRecebimento)
+  }
+
+  static restore(props: RestoreProps): OrdemServico {
+    const ordem = new OrdemServico(
+      props.id,
+      props.clienteId,
+      props.veiculoId,
+      props.dataRecebimento,
+    )
+    ordem._status = props.status
+    ordem._dataInicio = props.dataInicio
+    ordem._dataFinalizacao = props.dataFinalizacao
+    ordem._dataEntrega = props.dataEntrega
+    ordem._servicos.push(...props.servicos)
+    ordem._materiais.push(...props.materiais)
+    ordem._orcamentos.push(...props.orcamentos)
+    return ordem
   }
 
   get status(): StatusOrdemServico {

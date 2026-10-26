@@ -2,6 +2,7 @@ import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { DomainError } from '../../../../shared/domain/domain-error'
 import { ItemMaterial } from '../item-material'
 import { ItemServico } from '../item-servico'
+import { Orcamento } from '../orcamento'
 import { OrdemServico } from '../ordem-servico'
 import { StatusOrcamento } from '../status-orcamento'
 import { StatusOrdemServico } from '../status-ordem-servico'
@@ -168,5 +169,44 @@ describe('OrdemServico', () => {
 
   it.each(transicoesInvalidas)('recusa %s', (_descricao, acao) => {
     expect(() => acao(novaOrdem())).toThrow(DomainError)
+  })
+
+  it('restaura o estado completo sem passar pelas transições', () => {
+    const id = '3b2a1c0d-9e8f-4a7b-8c6d-5e4f3a2b1c0d'
+    const aprovado = Orcamento.restore(
+      Dinheiro.fromCents(18500),
+      StatusOrcamento.APROVADO,
+      dataEnvio,
+      dataResposta,
+    )
+
+    const ordem = OrdemServico.restore({
+      id,
+      clienteId,
+      veiculoId,
+      status: StatusOrdemServico.EM_EXECUCAO,
+      dataRecebimento,
+      dataInicio: dataResposta,
+      dataFinalizacao: null,
+      dataEntrega: null,
+      servicos: [troca],
+      materiais: [oleo],
+      orcamentos: [aprovado],
+    })
+
+    expect(ordem).toMatchObject({
+      id,
+      clienteId,
+      veiculoId,
+      status: StatusOrdemServico.EM_EXECUCAO,
+      dataRecebimento,
+      dataInicio: dataResposta,
+      dataFinalizacao: null,
+      dataEntrega: null,
+    })
+    expect(ordem.servicos).toEqual([troca])
+    expect(ordem.materiais).toEqual([oleo])
+    expect(ordem.orcamentos).toEqual([aprovado])
+    expect(ordem.total.cents).toBe(18500)
   })
 })

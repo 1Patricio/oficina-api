@@ -9,46 +9,55 @@ datasource db {
 }
 
 model Material {
-  id                    String @id @db.Uuid
+  id                    String   @id @db.Uuid
   nome                  String
-  precoUnitarioCentavos Int    @map("preco_unitario_centavos")
+  precoUnitarioCentavos Int      @map("preco_unitario_centavos")
   estoque               Int
+  createdAt             DateTime @default(now()) @map("created_at")
 
-  servicos ServicoMaterial[]
+  servicos      ServicoMaterial[]
+  itensMaterial ItemMaterial[]
 
   @@map("materiais")
 }
 
 model Veiculo {
-  id        String  @id @db.Uuid
-  placa     String  @unique
+  id        String   @id @db.Uuid
+  placa     String   @unique
   ano       Int
   marca     String
   modelo    String
-  clienteId String? @map("cliente_id") @db.Uuid
+  clienteId String?  @map("cliente_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
 
   cliente Cliente? @relation(fields: [clienteId], references: [id])
+
+  ordensServico OrdemServico[]
 
   @@map("veiculos")
 }
 
 model Cliente {
-  id        String @id @db.Uuid
-  documento String @unique
+  id        String   @id @db.Uuid
+  documento String   @unique
   nome      String
+  createdAt DateTime @default(now()) @map("created_at")
 
-  veiculos Veiculo[]
+  veiculos      Veiculo[]
+  ordensServico OrdemServico[]
 
   @@map("clientes")
 }
 
 model Servico {
-  id            String @id @db.Uuid
+  id            String   @id @db.Uuid
   nome          String
   descricao     String
-  precoCentavos Int    @map("preco_centavos")
+  precoCentavos Int      @map("preco_centavos")
+  createdAt     DateTime @default(now()) @map("created_at")
 
-  materiais ServicoMaterial[]
+  materiais    ServicoMaterial[]
+  itensServico ItemServico[]
 
   @@map("servicos")
 }
@@ -63,4 +72,84 @@ model ServicoMaterial {
 
   @@id([servicoId, materialId])
   @@map("servico_materiais")
+}
+
+enum StatusOrdemServico {
+  RECEBIDA
+  DIAGNOSTICO
+  AGUARDANDO_APROVACAO
+  EXECUCAO
+  FINALIZADA
+  ENTREGUE
+
+  @@map("status_ordem_servico")
+}
+
+enum StatusOrcamento {
+  PENDENTE
+  APROVADO
+  REJEITADO
+
+  @@map("status_orcamento")
+}
+
+model OrdemServico {
+  id              String             @id @db.Uuid
+  clienteId       String             @map("cliente_id") @db.Uuid
+  veiculoId       String             @map("veiculo_id") @db.Uuid
+  status          StatusOrdemServico
+  dataRecebimento DateTime           @map("data_recebimento")
+  dataInicio      DateTime?          @map("data_inicio")
+  dataFinalizacao DateTime?          @map("data_finalizacao")
+  dataEntrega     DateTime?          @map("data_entrega")
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  cliente    Cliente        @relation(fields: [clienteId], references: [id])
+  veiculo    Veiculo        @relation(fields: [veiculoId], references: [id])
+  servicos   ItemServico[]
+  materiais  ItemMaterial[]
+  orcamentos Orcamento[]
+
+  @@map("ordens_servico")
+}
+
+model ItemServico {
+  ordemServicoId String @map("ordem_servico_id") @db.Uuid
+  servicoId      String @map("servico_id") @db.Uuid
+  nome           String
+  precoCentavos  Int    @map("preco_centavos")
+
+  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+  servico      Servico      @relation(fields: [servicoId], references: [id])
+
+  @@id([ordemServicoId, servicoId])
+  @@map("itens_servico")
+}
+
+model ItemMaterial {
+  ordemServicoId        String @map("ordem_servico_id") @db.Uuid
+  materialId            String @map("material_id") @db.Uuid
+  nome                  String
+  precoUnitarioCentavos Int    @map("preco_unitario_centavos")
+  quantidade            Int
+
+  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+  material     Material     @relation(fields: [materialId], references: [id])
+
+  @@id([ordemServicoId, materialId])
+  @@map("itens_material")
+}
+
+model Orcamento {
+  ordemServicoId String          @map("ordem_servico_id") @db.Uuid
+  numero         Int
+  valorCentavos  Int             @map("valor_centavos")
+  status         StatusOrcamento
+  dataEnvio      DateTime        @map("data_envio")
+  dataResposta   DateTime?       @map("data_resposta")
+
+  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+
+  @@id([ordemServicoId, numero])
+  @@map("orcamentos")
 }

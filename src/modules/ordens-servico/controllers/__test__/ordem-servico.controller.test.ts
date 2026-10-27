@@ -19,8 +19,27 @@ import { InMemoryVeiculoRepository } from '../../../veiculos/__test__/double/in-
 import { VeiculoRepository } from '../../../veiculos/domain/repositories/veiculo.repository'
 import { Veiculo } from '../../../veiculos/domain/veiculo'
 import { InMemoryOrdemServicoRepository } from '../../__test__/double/in-memory-ordem-servico.repository'
+import { ItemMaterial } from '../../domain/item-material'
+import { ItemServico } from '../../domain/item-servico'
+import { OrdemServico } from '../../domain/ordem-servico'
 import { OrdemServicoRepository } from '../../domain/repositories/ordem-servico.repository'
 import { StatusOrdemServico } from '../../domain/status-ordem-servico'
+
+const clienteId = '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
+const veiculoId = '3f2504e0-4f89-41d3-9a0c-0305e82c3301'
+const servicoId = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
+const materialId = '9c858901-8a57-4791-81fe-4c455b099bc9'
+
+function ordemComOrcamento(): OrdemServico {
+  const ordem = OrdemServico.create(clienteId, veiculoId, new Date('2026-10-01T10:00:00Z'))
+  ordem.incluirServico(ItemServico.create(servicoId, 'Troca de óleo', Dinheiro.fromReais(150)))
+  ordem.incluirMaterial(
+    ItemMaterial.create(materialId, 'Filtro de óleo', Dinheiro.fromReais(25), 2),
+  )
+  ordem.iniciarDiagnostico()
+  ordem.enviarOrcamento(new Date('2026-10-02T10:00:00Z'))
+  return ordem
+}
 
 describe('POST /ordens-servico', () => {
   let app: INestApplication
@@ -106,5 +125,151 @@ describe('POST /ordens-servico', () => {
     expect(response.status).toBe(404)
     expect(response.body.message).toBe('Cliente não encontrado.')
     expect(repository.ordens).toHaveLength(0)
+  })
+})
+
+describe('GET /ordens-servico', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com a página pedida e o total em reais', async () => {
+    await repository.save(OrdemServico.create(clienteId, veiculoId))
+    const segunda = ordemComOrcamento()
+    await repository.save(segunda)
+
+    const response = await request(app.getHttpServer())
+      .get('/ordens-servico')
+      .query({ page: 2, rpp: 1 })
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      page: 2,
+      rpp: 1,
+      more: false,
+      list: [
+        {
+          id: segunda.id,
+          clienteId,
+          veiculoId,
+          status: StatusOrdemServico.AGUARDANDO_APROVACAO,
+          dataRecebimento: '2026-10-01T10:00:00.000Z',
+          total: 200,
+        },
+      ],
+    })
+  })
+
+  it('filtra pelo status informado', async () => {
+    await repository.save(OrdemServico.create(clienteId, veiculoId))
+    const aguardando = ordemComOrcamento()
+    await repository.save(aguardando)
+
+    const response = await request(app.getHttpServer())
+      .get('/ordens-servico')
+      .query({ status: StatusOrdemServico.AGUARDANDO_APROVACAO })
+
+    expect(response.status).toBe(200)
+    expect(response.body.list.map((ordem: { id: string }) => ordem.id)).toEqual([aguardando.id])
+  })
+
+  it('responde 400 quando o status não existe', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/ordens-servico')
+      .query({ status: 'EM_ALGUM_LUGAR' })
+
+    expect(response.status).toBe(400)
+  })
+})
+
+describe('GET /ordens-servico/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com a ordem, os itens, o orçamento e os valores em reais', async () => {
+    const ordem = ordemComOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).get(`/ordens-servico/${ordem.id}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      id: ordem.id,
+      clienteId,
+      veiculoId,
+      status: StatusOrdemServico.AGUARDANDO_APROVACAO,
+      dataRecebimento: '2026-10-01T10:00:00.000Z',
+      dataInicio: null,
+      dataFinalizacao: null,
+      dataEntrega: null,
+      servicos: [{ servicoId, nome: 'Troca de óleo', preco: 150 }],
+      materiais: [
+        { materialId, nome: 'Filtro de óleo', precoUnitario: 25, quantidade: 2, subtotal: 50 },
+      ],
+      orcamentos: [
+        {
+          valor: 200,
+          status: 'PENDENTE',
+          dataEnvio: '2026-10-02T10:00:00.000Z',
+          dataResposta: null,
+        },
+      ],
+      total: 200,
+    })
+  })
+
+  it('responde 404 quando a ordem não existe', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/ordens-servico/6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
+    )
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('Ordem de serviço não encontrada.')
+  })
+
+  it('responde 400 quando o id não é válido', async () => {
+    const response = await request(app.getHttpServer()).get('/ordens-servico/abc')
+
+    expect(response.status).toBe(400)
+    expect(response.body.message).toBe('Id inválido.')
   })
 })

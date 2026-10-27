@@ -95,6 +95,7 @@ enum StatusOrcamento {
 
 model OrdemServico {
   id              String             @id @db.Uuid
+  numero          Int                @unique @default(autoincrement())
   clienteId       String             @map("cliente_id") @db.Uuid
   veiculoId       String             @map("veiculo_id") @db.Uuid
   status          StatusOrdemServico
@@ -141,8 +142,8 @@ model ItemMaterial {
 }
 
 model Orcamento {
+  id             Int             @id @default(autoincrement())
   ordemServicoId String          @map("ordem_servico_id") @db.Uuid
-  numero         Int
   valorCentavos  Int             @map("valor_centavos")
   status         StatusOrcamento
   dataEnvio      DateTime        @map("data_envio")
@@ -150,6 +151,6 @@ model Orcamento {
 
   ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
 
-  @@id([ordemServicoId, numero])
+  @@index([ordemServicoId])
   @@map("orcamentos")
 }

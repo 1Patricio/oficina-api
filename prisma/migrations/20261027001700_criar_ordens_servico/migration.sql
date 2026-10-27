@@ -19,6 +19,7 @@ ALTER TABLE "veiculos" ADD COLUMN     "created_at" TIMESTAMP(3) NOT NULL DEFAULT
 -- CreateTable
 CREATE TABLE "ordens_servico" (
     "id" UUID NOT NULL,
+    "numero" SERIAL NOT NULL,
     "cliente_id" UUID NOT NULL,
     "veiculo_id" UUID NOT NULL,
     "status" "status_ordem_servico" NOT NULL,
@@ -54,15 +55,21 @@ CREATE TABLE "itens_material" (
 
 -- CreateTable
 CREATE TABLE "orcamentos" (
+    "id" SERIAL NOT NULL,
     "ordem_servico_id" UUID NOT NULL,
-    "numero" INTEGER NOT NULL,
     "valor_centavos" INTEGER NOT NULL,
     "status" "status_orcamento" NOT NULL,
     "data_envio" TIMESTAMP(3) NOT NULL,
     "data_resposta" TIMESTAMP(3),
 
-    CONSTRAINT "orcamentos_pkey" PRIMARY KEY ("ordem_servico_id","numero")
+    CONSTRAINT "orcamentos_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ordens_servico_numero_key" ON "ordens_servico"("numero");
+
+-- CreateIndex
+CREATE INDEX "orcamentos_ordem_servico_id_idx" ON "orcamentos"("ordem_servico_id");
 
 -- AddForeignKey
 ALTER TABLE "ordens_servico" ADD CONSTRAINT "ordens_servico_cliente_id_fkey" FOREIGN KEY ("cliente_id") REFERENCES "clientes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -7,6 +7,8 @@ import { OrdemServicoController } from './controllers/ordem-servico.controller'
 import { OrdemServicoRepository } from './domain/repositories/ordem-servico.repository'
 import { PrismaOrdemServicoRepository } from './infra/repositories/prisma-ordem-servico.repository'
 import { CreateOrdemServico } from './use-cases/create-ordem-servico.use-case'
+import { GetOrdemServico } from './use-cases/get-ordem-servico.use-case'
+import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
 
 @Module({
   imports: [ClienteModule, VeiculoModule, ServicoModule, EstoqueModule],
@@ -14,6 +16,8 @@ import { CreateOrdemServico } from './use-cases/create-ordem-servico.use-case'
   providers: [
     { provide: OrdemServicoRepository, useClass: PrismaOrdemServicoRepository },
     CreateOrdemServico,
+    ListOrdemServico,
+    GetOrdemServico,
   ],
   exports: [OrdemServicoRepository],
 })

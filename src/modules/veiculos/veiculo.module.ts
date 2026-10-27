@@ -16,5 +16,6 @@ import { ListVeiculos } from './use-cases/list-veiculos.use-case'
     ListVeiculos,
     GetVeiculo,
   ],
+  exports: [VeiculoRepository],
 })
 export class VeiculoModule {}

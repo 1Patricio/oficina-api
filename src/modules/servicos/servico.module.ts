@@ -16,5 +16,6 @@ import { ListServicos } from './use-cases/list-servicos.use-case'
     ListServicos,
     GetServico,
   ],
+  exports: [ServicoRepository],
 })
 export class ServicoModule {}

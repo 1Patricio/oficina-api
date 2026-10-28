@@ -23,6 +23,7 @@ import { ItemMaterial } from '../../domain/item-material'
 import { ItemServico } from '../../domain/item-servico'
 import { OrdemServico } from '../../domain/ordem-servico'
 import { OrdemServicoRepository } from '../../domain/repositories/ordem-servico.repository'
+import { StatusOrcamento } from '../../domain/status-orcamento'
 import { StatusOrdemServico } from '../../domain/status-ordem-servico'
 
 const clienteId = '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
@@ -271,5 +272,236 @@ describe('GET /ordens-servico/:id', () => {
 
     expect(response.status).toBe(400)
     expect(response.body.message).toBe('Id inválido.')
+  })
+})
+
+describe('POST /ordens-servico/:id/iniciar-diagnostico', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e move a ordem para diagnóstico', async () => {
+    const ordem = OrdemServico.create(clienteId, veiculoId)
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/iniciar-diagnostico`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.DIAGNOSTICO)
+  })
+
+  it('responde 422 quando a ordem não está recebida', async () => {
+    const ordem = ordemComOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/iniciar-diagnostico`,
+    )
+
+    expect(response.status).toBe(422)
+    expect(response.body.message).toBe('Transição de status inválida.')
+  })
+})
+
+describe('POST /ordens-servico/:id/enviar-orcamento', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e deixa a ordem aguardando aprovação com o orçamento enviado', async () => {
+    const ordem = OrdemServico.create(clienteId, veiculoId)
+    ordem.incluirServico(ItemServico.create(servicoId, 'Troca de óleo', Dinheiro.fromReais(150)))
+    ordem.iniciarDiagnostico()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/enviar-orcamento`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.AGUARDANDO_APROVACAO)
+    expect(ordem.orcamentos.map((orcamento) => orcamento.valor.reais)).toEqual([150])
+  })
+})
+
+describe('POST /ordens-servico/:id/itens', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+  let troca: Servico
+  let filtro: Material
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+    const servicoRepository = new InMemoryServicoRepository()
+    const materialRepository = new InMemoryMaterialRepository()
+
+    troca = Servico.create('Troca de óleo', 'Com 1L de óleo', Dinheiro.fromReais(150))
+    await servicoRepository.save(troca)
+    filtro = Material.create('Filtro de óleo', Dinheiro.fromReais(25), 10)
+    await materialRepository.save(filtro)
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .overrideProvider(ServicoRepository)
+      .useValue(servicoRepository)
+      .overrideProvider(MaterialRepository)
+      .useValue(materialRepository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e inclui os serviços e os materiais na ordem', async () => {
+    const ordem = OrdemServico.create(clienteId, veiculoId)
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer())
+      .post(`/ordens-servico/${ordem.id}/itens`)
+      .send({ servicoIds: [troca.id], materiais: [{ materialId: filtro.id, quantidade: 2 }] })
+
+    expect(response.status).toBe(204)
+    expect(ordem.total.reais).toBe(200)
+  })
+
+  it('responde 422 quando o orçamento já foi enviado', async () => {
+    const ordem = ordemComOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer())
+      .post(`/ordens-servico/${ordem.id}/itens`)
+      .send({ servicoIds: [troca.id] })
+
+    expect(response.status).toBe(422)
+    expect(response.body.message).toBe('Itens não podem ser alterados após o envio do orçamento.')
+  })
+})
+
+describe('POST /ordens-servico/:id/aprovar-orcamento', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e move a ordem para execução com o orçamento aprovado', async () => {
+    const ordem = ordemComOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/aprovar-orcamento`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.EXECUCAO)
+    expect(ordem.orcamentos.map((orcamento) => orcamento.status)).toEqual([
+      StatusOrcamento.APROVADO,
+    ])
+  })
+})
+
+describe('POST /ordens-servico/:id/rejeitar-orcamento', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e devolve a ordem ao diagnóstico com o orçamento rejeitado', async () => {
+    const ordem = ordemComOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/rejeitar-orcamento`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.DIAGNOSTICO)
+    expect(ordem.orcamentos.map((orcamento) => orcamento.status)).toEqual([
+      StatusOrcamento.REJEITADO,
+    ])
   })
 })

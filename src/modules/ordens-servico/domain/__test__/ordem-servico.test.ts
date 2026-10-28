@@ -86,11 +86,20 @@ describe('OrdemServico', () => {
     expect(() => novaOrdem().incluirServico(troca)).toThrow(DomainError)
   })
 
-  it('rejeita enviar o orçamento sem serviços', () => {
+  it('rejeita enviar o orçamento sem itens', () => {
     const ordem = OrdemServico.create(clienteId, veiculoId)
     ordem.iniciarDiagnostico()
 
     expect(() => ordem.enviarOrcamento()).toThrow(DomainError)
+  })
+
+  it('envia o orçamento só com materiais', () => {
+    const ordem = OrdemServico.create(clienteId, veiculoId)
+    ordem.incluirMaterial(oleo)
+    ordem.iniciarDiagnostico()
+    ordem.enviarOrcamento(dataEnvio)
+
+    expect(ordem.orcamentos[0].valor.cents).toBe(3500)
   })
 
   it('envia o orçamento pendente com o total e a data de envio', () => {

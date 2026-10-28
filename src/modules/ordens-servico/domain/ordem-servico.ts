@@ -123,7 +123,9 @@ export class OrdemServico extends Entity {
 
   enviarOrcamento(data: Date = new Date()): void {
     this.exigirStatus(StatusOrdemServico.DIAGNOSTICO)
-    if (this._servicos.length === 0) throw new DomainError('Informe ao menos um serviço.')
+    if (this._servicos.length === 0 && this._materiais.length === 0) {
+      throw new DomainError('Informe ao menos um item.')
+    }
     this._orcamentos.push(Orcamento.enviar(this.total, data))
     this._status = StatusOrdemServico.AGUARDANDO_APROVACAO
   }

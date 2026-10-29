@@ -8,6 +8,7 @@ import { Cliente } from '../../../clientes/domain/cliente'
 import { InMemoryMaterialRepository } from '../../../estoque/__test__/double/in-memory-material.repository'
 import { Material } from '../../../estoque/domain/material'
 import { InMemoryServicoRepository } from '../../../servicos/__test__/double/in-memory-servico.repository'
+import { MaterialNecessario } from '../../../servicos/domain/material-necessario'
 import { Servico } from '../../../servicos/domain/servico'
 import { InMemoryVeiculoRepository } from '../../../veiculos/__test__/double/in-memory-veiculo.repository'
 import { Veiculo } from '../../../veiculos/domain/veiculo'
@@ -61,11 +62,13 @@ describe('CreateOrdemServico', () => {
     expect(salva?.materiais).toHaveLength(0)
   })
 
-  it('inclui serviços e materiais com o nome e o preço do catálogo', async () => {
-    const troca = Servico.create('Troca de óleo', 'Com 1L de óleo', Dinheiro.fromReais(150))
-    await servicoRepository.save(troca)
+  it('inclui serviços com os materiais que consomem e materiais com o nome e o preço do catálogo', async () => {
     const filtro = Material.create('Filtro de óleo', Dinheiro.fromReais(25), 10)
     await materialRepository.save(filtro)
+    const troca = Servico.create('Troca de óleo', 'Com 1L de óleo', Dinheiro.fromReais(150), [
+      MaterialNecessario.create(filtro.id, 1),
+    ])
+    await servicoRepository.save(troca)
 
     const { id } = await createOrdemServico.execute({
       documento: '529.982.247-25',
@@ -76,6 +79,7 @@ describe('CreateOrdemServico', () => {
 
     const salva = await repository.findById(id)
     expect(salva?.servicos[0]?.nome).toBe('Troca de óleo')
+    expect(salva?.servicos[0]?.materiais).toEqual([MaterialNecessario.create(filtro.id, 1)])
     expect(salva?.materiais[0]?.nome).toBe('Filtro de óleo')
     expect(salva?.materiais[0]?.quantidade).toBe(3)
     expect(salva?.total.cents).toBe(22500)

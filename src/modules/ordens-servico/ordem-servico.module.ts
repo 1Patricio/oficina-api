@@ -6,9 +6,16 @@ import { VeiculoModule } from '../veiculos/veiculo.module'
 import { OrdemServicoController } from './controllers/ordem-servico.controller'
 import { OrdemServicoRepository } from './domain/repositories/ordem-servico.repository'
 import { PrismaOrdemServicoRepository } from './infra/repositories/prisma-ordem-servico.repository'
+import { AprovarOrcamento } from './use-cases/aprovar-orcamento.use-case'
 import { CreateOrdemServico } from './use-cases/create-ordem-servico.use-case'
+import { EntregarOrdemServico } from './use-cases/entregar-ordem-servico.use-case'
+import { EnviarOrcamento } from './use-cases/enviar-orcamento.use-case'
+import { FinalizarOrdemServico } from './use-cases/finalizar-ordem-servico.use-case'
 import { GetOrdemServico } from './use-cases/get-ordem-servico.use-case'
+import { IncluirItens } from './use-cases/incluir-itens.use-case'
+import { IniciarDiagnostico } from './use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
+import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
 
 @Module({
   imports: [ClienteModule, VeiculoModule, ServicoModule, EstoqueModule],
@@ -18,6 +25,13 @@ import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
     CreateOrdemServico,
     ListOrdemServico,
     GetOrdemServico,
+    IncluirItens,
+    IniciarDiagnostico,
+    EnviarOrcamento,
+    AprovarOrcamento,
+    RejeitarOrcamento,
+    FinalizarOrdemServico,
+    EntregarOrdemServico,
   ],
   exports: [OrdemServicoRepository],
 })

@@ -51,7 +51,7 @@ export class CreateOrdemServico {
       servicoIds.map(async (servicoId) => {
         const servico = await this.servicoRepository.findById(servicoId)
         if (!servico) throw new NotFoundError('Serviço não encontrado.')
-        return ItemServico.create(servico.id, servico.nome, servico.preco)
+        return ItemServico.create(servico.id, servico.nome, servico.preco, servico.materiais)
       }),
     )
     const itensMaterial = await Promise.all(

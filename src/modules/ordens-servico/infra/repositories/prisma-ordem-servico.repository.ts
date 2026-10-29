@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
 import type {
   ItemMaterialModel,
+  ItemServicoMaterialModel,
   ItemServicoModel,
   OrcamentoModel,
   OrdemServicoModel,
 } from '../../../../generated/prisma/models'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { Page } from '../../../../shared/domain/page'
+import { MaterialNecessario } from '../../../servicos/domain/material-necessario'
 import { ItemMaterial } from '../../domain/item-material'
 import { ItemServico } from '../../domain/item-servico'
 import { Orcamento } from '../../domain/orcamento'
@@ -31,10 +33,13 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
       dataEntrega: ordem.dataEntrega,
     }
 
-    const servicos = ordem.servicos.map(({ servicoId, nome, preco }) => ({
+    const servicos = ordem.servicos.map(({ servicoId, nome, preco, materiais }) => ({
       servicoId,
       nome,
       precoCentavos: preco.cents,
+      materiais: {
+        create: materiais.map(({ materialId, quantidade }) => ({ materialId, quantidade })),
+      },
     }))
 
     const materiais = ordem.materiais.map(({ materialId, nome, precoUnitario, quantidade }) => ({
@@ -73,7 +78,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
     const ordem = await this.prisma.ordemServico.findUnique({
       where: { id },
       include: {
-        servicos: true,
+        servicos: { include: { materiais: true } },
         materiais: true,
         orcamentos: { orderBy: [{ dataEnvio: 'asc' }, { id: 'asc' }] },
       },
@@ -85,7 +90,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
     const ordens = await this.prisma.ordemServico.findMany({
       where: { status },
       include: {
-        servicos: true,
+        servicos: { include: { materiais: true } },
         materiais: true,
         orcamentos: { orderBy: [{ dataEnvio: 'asc' }, { id: 'asc' }] },
       },
@@ -100,7 +105,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
 
 function toDomain(
   ordem: OrdemServicoModel & {
-    servicos: ItemServicoModel[]
+    servicos: (ItemServicoModel & { materiais: ItemServicoMaterialModel[] })[]
     materiais: ItemMaterialModel[]
     orcamentos: OrcamentoModel[]
   },
@@ -114,8 +119,15 @@ function toDomain(
     dataInicio: ordem.dataInicio,
     dataFinalizacao: ordem.dataFinalizacao,
     dataEntrega: ordem.dataEntrega,
-    servicos: ordem.servicos.map(({ servicoId, nome, precoCentavos }) =>
-      ItemServico.create(servicoId, nome, Dinheiro.fromCents(precoCentavos)),
+    servicos: ordem.servicos.map(({ servicoId, nome, precoCentavos, materiais }) =>
+      ItemServico.create(
+        servicoId,
+        nome,
+        Dinheiro.fromCents(precoCentavos),
+        materiais.map(({ materialId, quantidade }) =>
+          MaterialNecessario.create(materialId, quantidade),
+        ),
+      ),
     ),
     materiais: ordem.materiais.map(({ materialId, nome, precoUnitarioCentavos, quantidade }) =>
       ItemMaterial.create(materialId, nome, Dinheiro.fromCents(precoUnitarioCentavos), quantidade),

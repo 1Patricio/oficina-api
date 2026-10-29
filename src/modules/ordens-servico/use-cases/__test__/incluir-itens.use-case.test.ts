@@ -3,6 +3,7 @@ import { NotFoundError } from '../../../../shared/domain/not-found-error'
 import { InMemoryMaterialRepository } from '../../../estoque/__test__/double/in-memory-material.repository'
 import { Material } from '../../../estoque/domain/material'
 import { InMemoryServicoRepository } from '../../../servicos/__test__/double/in-memory-servico.repository'
+import { MaterialNecessario } from '../../../servicos/domain/material-necessario'
 import { Servico } from '../../../servicos/domain/servico'
 import { InMemoryOrdemServicoRepository } from '../../__test__/double/in-memory-ordem-servico.repository'
 import { OrdemServico } from '../../domain/ordem-servico'
@@ -30,11 +31,13 @@ describe('IncluirItens', () => {
     await repository.save(ordem)
   })
 
-  it('inclui serviços e materiais com o preço do catálogo e salva', async () => {
-    const troca = Servico.create('Troca de óleo', 'Com 1L de óleo', Dinheiro.fromReais(150))
-    await servicoRepository.save(troca)
+  it('inclui serviços com os materiais que consomem e materiais com o preço do catálogo e salva', async () => {
     const filtro = Material.create('Filtro de óleo', Dinheiro.fromReais(25), 10)
     await materialRepository.save(filtro)
+    const troca = Servico.create('Troca de óleo', 'Com 1L de óleo', Dinheiro.fromReais(150), [
+      MaterialNecessario.create(filtro.id, 1),
+    ])
+    await servicoRepository.save(troca)
     const save = vi.spyOn(repository, 'save')
 
     await incluirItens.execute({
@@ -44,6 +47,7 @@ describe('IncluirItens', () => {
     })
 
     expect(ordem.total.reais).toBe(200)
+    expect(ordem.servicos[0]?.materiais).toEqual([MaterialNecessario.create(filtro.id, 1)])
     expect(save).toHaveBeenCalledWith(ordem)
   })
 

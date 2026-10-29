@@ -15,8 +15,9 @@ model Material {
   estoque               Int
   createdAt             DateTime @default(now()) @map("created_at")
 
-  servicos      ServicoMaterial[]
-  itensMaterial ItemMaterial[]
+  servicos             ServicoMaterial[]
+  itensMaterial        ItemMaterial[]
+  itensServicoMaterial ItemServicoMaterial[]
 
   @@map("materiais")
 }
@@ -120,11 +121,25 @@ model ItemServico {
   nome           String
   precoCentavos  Int    @map("preco_centavos")
 
-  ordemServico OrdemServico @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
-  servico      Servico      @relation(fields: [servicoId], references: [id])
+  ordemServico OrdemServico          @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+  servico      Servico               @relation(fields: [servicoId], references: [id])
+  materiais    ItemServicoMaterial[]
 
   @@id([ordemServicoId, servicoId])
   @@map("itens_servico")
+}
+
+model ItemServicoMaterial {
+  ordemServicoId String @map("ordem_servico_id") @db.Uuid
+  servicoId      String @map("servico_id") @db.Uuid
+  materialId     String @map("material_id") @db.Uuid
+  quantidade     Int
+
+  itemServico ItemServico @relation(fields: [ordemServicoId, servicoId], references: [ordemServicoId, servicoId], onDelete: Cascade)
+  material    Material    @relation(fields: [materialId], references: [id])
+
+  @@id([ordemServicoId, servicoId, materialId])
+  @@map("itens_servico_materiais")
 }
 
 model ItemMaterial {

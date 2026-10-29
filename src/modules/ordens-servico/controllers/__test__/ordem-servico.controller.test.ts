@@ -505,3 +505,78 @@ describe('POST /ordens-servico/:id/rejeitar-orcamento', () => {
     ])
   })
 })
+
+describe('POST /ordens-servico/:id/finalizar', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e finaliza a ordem em execução', async () => {
+    const ordem = ordemComOrcamento()
+    ordem.aprovarOrcamento()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/finalizar`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.FINALIZADA)
+  })
+})
+
+describe('POST /ordens-servico/:id/entregar', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e entrega a ordem finalizada', async () => {
+    const ordem = ordemComOrcamento()
+    ordem.aprovarOrcamento()
+    ordem.finalizar()
+    await repository.save(ordem)
+
+    const response = await request(app.getHttpServer()).post(`/ordens-servico/${ordem.id}/entregar`)
+
+    expect(response.status).toBe(204)
+    expect(ordem.status).toBe(StatusOrdemServico.ENTREGUE)
+  })
+})

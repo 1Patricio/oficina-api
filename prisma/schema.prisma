@@ -42,7 +42,8 @@ model Cliente {
   id        String   @id @db.Uuid
   documento String   @unique
   nome      String
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
 
   veiculos      Veiculo[]
   ordensServico OrdemServico[]

@@ -19,9 +19,18 @@ export class CreateCliente {
 
   async execute({ documento, nome }: Request): Promise<Response> {
     const cliente = Cliente.create(Documento.create(documento), nome)
-    if (await this.clienteRepository.findByDocumento(cliente.documento)) {
-      throw new ConflictError('Cliente já cadastrado.')
+    const cadastrado = await this.clienteRepository.findByDocumento(cliente.documento, {
+      withDeleted: true,
+    })
+
+    if (cadastrado && !cadastrado.deletedAt) throw new ConflictError('Cliente já cadastrado.')
+
+    if (cadastrado) {
+      const reativado = Cliente.restore(cadastrado.id, cliente.documento, nome, null)
+      await this.clienteRepository.save(reativado)
+      return { id: reativado.id }
     }
+
     await this.clienteRepository.save(cliente)
     return { id: cliente.id }
   }

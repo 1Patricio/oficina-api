@@ -142,3 +142,129 @@ describe('GET /materiais', () => {
     expect(response.status).toBe(400)
   })
 })
+
+describe('GET /materiais/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryMaterialRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryMaterialRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(MaterialRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com o material e o preço em reais', async () => {
+    const filtro = Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10)
+
+    await repository.save(filtro)
+
+    const response = await request(app.getHttpServer()).get(`/materiais/${filtro.id}`)
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({
+      id: filtro.id,
+      nome: 'Filtro de óleo',
+      precoUnitario: 45.9,
+      estoque: 10,
+    })
+  })
+
+  it('responde 404 quando o material não existe', async () => {
+    const response = await request(app.getHttpServer()).get(
+      '/materiais/6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
+    )
+
+    expect(response.status).toBe(404)
+    expect(response.body.message).toBe('Material não encontrado.')
+  })
+})
+
+describe('PUT /materiais/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryMaterialRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryMaterialRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(MaterialRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e atualiza o material', async () => {
+    const filtro = Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10)
+
+    await repository.save(filtro)
+
+    const response = await request(app.getHttpServer()).put(`/materiais/${filtro.id}`).send({
+      nome: 'Filtro de ar',
+      precoUnitario: 52.9,
+      estoque: 3,
+    })
+
+    expect(response.status).toBe(204)
+    expect(filtro.nome).toBe('Filtro de ar')
+  })
+})
+
+describe('DELETE /materiais/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryMaterialRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryMaterialRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(MaterialRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e marca o material como excluído', async () => {
+    const filtro = Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10)
+
+    await repository.save(filtro)
+
+    const response = await request(app.getHttpServer()).delete(`/materiais/${filtro.id}`)
+
+    expect(response.status).toBe(204)
+    expect(filtro.deletedAt).toBeInstanceOf(Date)
+  })
+})

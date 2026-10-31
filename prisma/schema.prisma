@@ -13,7 +13,8 @@ model Material {
   nome                  String
   precoUnitarioCentavos Int      @map("preco_unitario_centavos")
   estoque               Int
-  createdAt             DateTime @default(now()) @map("created_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  deletedAt             DateTime? @map("deleted_at")
 
   servicos             ServicoMaterial[]
   itensMaterial        ItemMaterial[]

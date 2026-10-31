@@ -15,6 +15,7 @@ export class PrismaMaterialRepository implements MaterialRepository {
       nome: material.nome,
       precoUnitarioCentavos: material.precoUnitario.cents,
       estoque: material.estoque,
+      deletedAt: material.deletedAt,
     }
 
     await this.prisma.material.upsert({
@@ -25,13 +26,20 @@ export class PrismaMaterialRepository implements MaterialRepository {
   }
 
   async findById(id: string): Promise<Material | null> {
-    const material = await this.prisma.material.findUnique({ where: { id } })
+    const material = await this.prisma.material.findUnique({ where: { id, deletedAt: null } })
     return material ? toDomain(material) : null
+  }
+
+  async isUsedInServico(id: string): Promise<boolean> {
+    const servicoMaterial = await this.prisma.servicoMaterial.findFirst({
+      where: { materialId: id },
+    })
+    return servicoMaterial !== null
   }
 
   async list(page: number, rpp: number, term?: string): Promise<Page<Material>> {
     const materiais = await this.prisma.material.findMany({
-      where: { nome: { contains: term, mode: 'insensitive' } },
+      where: { nome: { contains: term, mode: 'insensitive' }, deletedAt: null },
       orderBy: { nome: 'asc' },
       skip: (page - 1) * rpp,
       take: rpp + 1,
@@ -46,5 +54,6 @@ function toDomain(material: MaterialModel): Material {
     material.nome,
     Dinheiro.fromCents(material.precoUnitarioCentavos),
     material.estoque,
+    material.deletedAt,
   )
 }

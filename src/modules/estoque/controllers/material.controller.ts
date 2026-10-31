@@ -1,8 +1,24 @@
-import { Body, Controller, Get, Inject, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common'
+import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateMaterial } from '../use-cases/create-material.use-case'
+import { DeleteMaterial } from '../use-cases/delete-material.use-case'
+import { GetMaterial } from '../use-cases/get-material.use-case'
 import { ListMateriais } from '../use-cases/list-materiais.use-case'
+import { UpdateMaterial } from '../use-cases/update-material.use-case'
 import { CreateMaterialDTO } from './dtos/create-material.dto'
 import { ListMateriaisQueryDTO } from './dtos/list-materiais-query.dto'
+import { UpdateMaterialDTO } from './dtos/update-material.dto'
 
 @Controller('/materiais')
 export class MaterialController {
@@ -12,6 +28,15 @@ export class MaterialController {
   @Inject(ListMateriais)
   private readonly listMateriais: ListMateriais
 
+  @Inject(GetMaterial)
+  private readonly getMaterial: GetMaterial
+
+  @Inject(UpdateMaterial)
+  private readonly updateMaterial: UpdateMaterial
+
+  @Inject(DeleteMaterial)
+  private readonly deleteMaterial: DeleteMaterial
+
   @Post('/')
   create(@Body() material: CreateMaterialDTO) {
     return this.createMaterial.execute(material)
@@ -20,5 +45,22 @@ export class MaterialController {
   @Get('/')
   list(@Query() query: ListMateriaisQueryDTO) {
     return this.listMateriais.execute({ page: query.page, rpp: query.rpp, term: query.nome })
+  }
+
+  @Get('/:id')
+  get(@Param('id', ParseIdPipe) materialId: string) {
+    return this.getMaterial.execute({ materialId })
+  }
+
+  @Put('/:id')
+  @HttpCode(204)
+  update(@Param('id', ParseIdPipe) materialId: string, @Body() material: UpdateMaterialDTO) {
+    return this.updateMaterial.execute({ materialId, ...material })
+  }
+
+  @Delete('/:id')
+  @HttpCode(204)
+  delete(@Param('id', ParseIdPipe) materialId: string) {
+    return this.deleteMaterial.execute({ materialId })
   }
 }

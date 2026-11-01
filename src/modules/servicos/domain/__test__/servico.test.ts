@@ -48,4 +48,25 @@ describe('Servico', () => {
     expect(servico.preco.equals(preco)).toBe(true)
     expect(servico.materiais).toEqual([oleo])
   })
+
+  it('atualiza nome, descrição, preço e materiais necessários', () => {
+    const servico = Servico.create('Troca óleo', 'Troca de óleo com 1L de óleo', preco, [oleo])
+    const outroPreco = Dinheiro.fromCents(18000)
+
+    servico.update('Troca óleo e filtro', 'Troca de óleo e filtro', outroPreco, [oleo, filtro])
+
+    expect(servico.nome).toBe('Troca óleo e filtro')
+    expect(servico.descricao).toBe('Troca de óleo e filtro')
+    expect(servico.preco.equals(outroPreco)).toBe(true)
+    expect(servico.materiais).toEqual([oleo, filtro])
+  })
+
+  it('rejeita atualizar com dados inválidos', () => {
+    const servico = Servico.create('Troca óleo', 'Troca de óleo com 1L de óleo', preco)
+
+    expect(() => servico.update('  ', 'Troca de óleo', preco, [])).toThrow(DomainError)
+    expect(() => servico.update('Troca óleo', 'Troca de óleo', preco, [oleo, oleo])).toThrow(
+      DomainError,
+    )
+  })
 })

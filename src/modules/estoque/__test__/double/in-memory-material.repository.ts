@@ -20,6 +20,10 @@ export class InMemoryMaterialRepository extends MaterialRepository {
     return Promise.resolve(material ?? null)
   }
 
+  findManyByIds(ids: string[]): Promise<Material[]> {
+    return Promise.resolve(this.ativos.filter((item) => ids.includes(item.id)))
+  }
+
   isUsedInServico(id: string): Promise<boolean> {
     return Promise.resolve(this.usadosEmServico.has(id))
   }

@@ -30,6 +30,13 @@ export class PrismaMaterialRepository implements MaterialRepository {
     return material ? toDomain(material) : null
   }
 
+  async findManyByIds(ids: string[]): Promise<Material[]> {
+    const materiais = await this.prisma.material.findMany({
+      where: { id: { in: ids }, deletedAt: null },
+    })
+    return materiais.map((material) => toDomain(material))
+  }
+
   async isUsedInServico(id: string): Promise<boolean> {
     const servicoMaterial = await this.prisma.servicoMaterial.findFirst({
       where: { materialId: id },

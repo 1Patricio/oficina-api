@@ -7,15 +7,14 @@ import type { MaterialNecessario } from './material-necessario'
 export class Servico extends Entity {
   private constructor(
     id: string,
-    readonly nome: string,
-    readonly descricao: string,
-    readonly preco: Dinheiro,
-    readonly materiais: readonly MaterialNecessario[],
+    private _nome: string,
+    private _descricao: string,
+    private _preco: Dinheiro,
+    private _materiais: readonly MaterialNecessario[],
   ) {
     super(id)
-    if (nome.trim() === '') throw new DomainError('Nome não informado.')
-    const materialIds = new Set(materiais.map((material) => material.materialId))
-    if (materialIds.size !== materiais.length) throw new DomainError('Material duplicado.')
+    validateNome(_nome)
+    validateMateriais(_materiais)
   }
 
   static create(
@@ -36,4 +35,44 @@ export class Servico extends Entity {
   ): Servico {
     return new Servico(id, nome, descricao, preco, materiais)
   }
+
+  get nome(): string {
+    return this._nome
+  }
+
+  get descricao(): string {
+    return this._descricao
+  }
+
+  get preco(): Dinheiro {
+    return this._preco
+  }
+
+  get materiais(): readonly MaterialNecessario[] {
+    return this._materiais
+  }
+
+  update(
+    nome: string,
+    descricao: string,
+    preco: Dinheiro,
+    materiais: readonly MaterialNecessario[],
+  ): void {
+    validateNome(nome)
+    validateMateriais(materiais)
+
+    this._nome = nome
+    this._descricao = descricao
+    this._preco = preco
+    this._materiais = materiais
+  }
+}
+
+function validateNome(nome: string): void {
+  if (nome.trim() === '') throw new DomainError('Nome não informado.')
+}
+
+function validateMateriais(materiais: readonly MaterialNecessario[]): void {
+  const materialIds = new Set(materiais.map((material) => material.materialId))
+  if (materialIds.size !== materiais.length) throw new DomainError('Material duplicado.')
 }

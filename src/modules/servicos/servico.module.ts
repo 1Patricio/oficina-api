@@ -6,6 +6,7 @@ import { PrismaServicoRepository } from './infra/repositories/prisma-servico.rep
 import { CreateServico } from './use-cases/create-servico.use-case'
 import { GetServico } from './use-cases/get-servico.use-case'
 import { ListServicos } from './use-cases/list-servicos.use-case'
+import { UpdateServico } from './use-cases/update-servico.use-case'
 
 @Module({
   imports: [EstoqueModule],
@@ -15,6 +16,7 @@ import { ListServicos } from './use-cases/list-servicos.use-case'
     CreateServico,
     ListServicos,
     GetServico,
+    UpdateServico,
   ],
   exports: [ServicoRepository],
 })

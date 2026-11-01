@@ -182,3 +182,45 @@ describe('GET /servicos/:id', () => {
     expect(response.body.message).toBe('Serviço não encontrado.')
   })
 })
+
+describe('PUT /servicos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(ServicoRepository)
+      .useValue(repository)
+      .overrideProvider(MaterialRepository)
+      .useValue(new InMemoryMaterialRepository())
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e atualiza o serviço', async () => {
+    const trocaOleo = Servico.create('Troca de óleo', 'Troca com 1L de óleo', preco)
+
+    await repository.save(trocaOleo)
+
+    const response = await request(app.getHttpServer()).put(`/servicos/${trocaOleo.id}`).send({
+      nome: 'Troca de óleo e filtro',
+      descricao: 'Troca de óleo e filtro de óleo',
+      preco: 180,
+    })
+
+    expect(response.status).toBe(204)
+    expect(trocaOleo.nome).toBe('Troca de óleo e filtro')
+  })
+})

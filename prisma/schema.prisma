@@ -29,8 +29,9 @@ model Veiculo {
   ano       Int
   marca     String
   modelo    String
-  clienteId String?  @map("cliente_id") @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
+  clienteId String?   @map("cliente_id") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
 
   cliente Cliente? @relation(fields: [clienteId], references: [id])
 

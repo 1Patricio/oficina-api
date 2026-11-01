@@ -19,11 +19,12 @@ export class UpdateCliente {
 
     if (!cliente) throw new NotFoundError('Cliente não encontrado.')
 
-    const cadastrado = await this.clienteRepository.findByDocumento(Documento.create(documento), {
-      withDeleted: true,
-    })
+    const existingCliente = await this.clienteRepository.findByDocumento(
+      Documento.create(documento),
+      { withDeleted: true },
+    )
 
-    if (cadastrado && !cadastrado.equals(cliente)) {
+    if (existingCliente && !existingCliente.equals(cliente)) {
       throw new ConflictError('Documento já cadastrado.')
     }
 

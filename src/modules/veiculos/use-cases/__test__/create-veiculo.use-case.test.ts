@@ -2,9 +2,11 @@ import { ConflictError } from '../../../../shared/domain/conflict-error'
 import { Documento } from '../../../../shared/domain/documento'
 import { DomainError } from '../../../../shared/domain/domain-error'
 import { NotFoundError } from '../../../../shared/domain/not-found-error'
+import { Placa } from '../../../../shared/domain/placa'
 import { InMemoryClienteRepository } from '../../../clientes/__test__/double/in-memory-cliente.repository'
 import { Cliente } from '../../../clientes/domain/cliente'
 import { InMemoryVeiculoRepository } from '../../__test__/double/in-memory-veiculo.repository'
+import { Veiculo } from '../../domain/veiculo'
 import { CreateVeiculo } from '../create-veiculo.use-case'
 
 const fakeVeiculo = {
@@ -65,6 +67,21 @@ describe('CreateVeiculo', () => {
 
     await expect(createVeiculo.execute(fakeVeiculo)).rejects.toThrow(ConflictError)
     expect(repository.veiculos).toHaveLength(1)
+  })
+
+  it('reativa o veículo excluído com o mesmo id e os dados informados', async () => {
+    const uno = Veiculo.create(Placa.create(fakeVeiculo.placa), 2005, 'Fiat', 'Uno')
+    uno.delete()
+
+    await repository.save(uno)
+
+    const { id } = await createVeiculo.execute(fakeVeiculo)
+
+    expect(id).toBe(uno.id)
+
+    const reativado = await repository.findById(id)
+
+    expect(reativado?.modelo).toBe('Gol')
   })
 
   it('rejeita marca vazia sem salvar', async () => {

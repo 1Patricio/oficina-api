@@ -41,12 +41,21 @@ describe('Servico', () => {
 
   it('restaura com o id e os dados informados', () => {
     const id = '3b2a1c0d-9e8f-4a7b-8c6d-5e4f3a2b1c0d'
-    const servico = Servico.restore(id, 'Troca óleo', 'Troca de óleo com 1L de óleo', preco, [oleo])
+    const deletedAt = new Date('2026-11-03T12:00:00Z')
+    const servico = Servico.restore(
+      id,
+      'Troca óleo',
+      'Troca de óleo com 1L de óleo',
+      preco,
+      [oleo],
+      deletedAt,
+    )
     expect(servico.id).toBe(id)
     expect(servico.nome).toBe('Troca óleo')
     expect(servico.descricao).toBe('Troca de óleo com 1L de óleo')
     expect(servico.preco.equals(preco)).toBe(true)
     expect(servico.materiais).toEqual([oleo])
+    expect(servico.deletedAt).toBe(deletedAt)
   })
 
   it('atualiza nome, descrição, preço e materiais necessários', () => {
@@ -68,5 +77,14 @@ describe('Servico', () => {
     expect(() => servico.update('Troca óleo', 'Troca de óleo', preco, [oleo, oleo])).toThrow(
       DomainError,
     )
+  })
+
+  it('marca como excluído na data informada', () => {
+    const servico = Servico.create('Troca óleo', 'Troca de óleo com 1L de óleo', preco)
+    const data = new Date('2026-11-03T12:00:00Z')
+
+    servico.delete(data)
+
+    expect(servico.deletedAt).toBe(data)
   })
 })

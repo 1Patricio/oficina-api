@@ -16,12 +16,12 @@ export class InMemoryMaterialRepository extends MaterialRepository {
   }
 
   findById(id: string): Promise<Material | null> {
-    const material = this.ativos.find((item) => item.id === id)
+    const material = this.notDeleted.find((item) => item.id === id)
     return Promise.resolve(material ?? null)
   }
 
   findManyByIds(ids: string[]): Promise<Material[]> {
-    return Promise.resolve(this.ativos.filter((item) => ids.includes(item.id)))
+    return Promise.resolve(this.notDeleted.filter((item) => ids.includes(item.id)))
   }
 
   isUsedInServico(id: string): Promise<boolean> {
@@ -29,11 +29,11 @@ export class InMemoryMaterialRepository extends MaterialRepository {
   }
 
   list(page: number, rpp: number): Promise<Page<Material>> {
-    const list = this.ativos.slice((page - 1) * rpp, page * rpp + 1)
+    const list = this.notDeleted.slice((page - 1) * rpp, page * rpp + 1)
     return Promise.resolve(Page.create({ page, rpp, list }))
   }
 
-  private get ativos(): Material[] {
+  private get notDeleted(): Material[] {
     return this.materiais.filter((item) => !item.deletedAt)
   }
 }

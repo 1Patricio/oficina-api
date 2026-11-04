@@ -1,6 +1,18 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Put, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateServico } from '../use-cases/create-servico.use-case'
+import { DeleteServico } from '../use-cases/delete-servico.use-case'
 import { GetServico } from '../use-cases/get-servico.use-case'
 import { ListServicos } from '../use-cases/list-servicos.use-case'
 import { UpdateServico } from '../use-cases/update-servico.use-case'
@@ -22,6 +34,9 @@ export class ServicoController {
   @Inject(UpdateServico)
   private readonly updateServico: UpdateServico
 
+  @Inject(DeleteServico)
+  private readonly deleteServico: DeleteServico
+
   @Post('/')
   create(@Body() servico: CreateServicoDTO) {
     return this.createServico.execute(servico)
@@ -41,5 +56,11 @@ export class ServicoController {
   @HttpCode(204)
   update(@Param('id', ParseIdPipe) servicoId: string, @Body() servico: UpdateServicoDTO) {
     return this.updateServico.execute({ servicoId, ...servico })
+  }
+
+  @Delete('/:id')
+  @HttpCode(204)
+  delete(@Param('id', ParseIdPipe) servicoId: string) {
+    return this.deleteServico.execute({ servicoId })
   }
 }

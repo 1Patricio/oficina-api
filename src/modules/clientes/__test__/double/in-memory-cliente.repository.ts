@@ -16,7 +16,7 @@ export class InMemoryClienteRepository extends ClienteRepository {
   }
 
   findById(id: string): Promise<Cliente | null> {
-    const cliente = this.ativos.find((item) => item.id === id)
+    const cliente = this.notDeleted.find((item) => item.id === id)
     return Promise.resolve(cliente ?? null)
   }
 
@@ -24,17 +24,17 @@ export class InMemoryClienteRepository extends ClienteRepository {
     documento: Documento,
     options?: { withDeleted?: boolean },
   ): Promise<Cliente | null> {
-    const itens = options?.withDeleted ? this.clientes : this.ativos
+    const itens = options?.withDeleted ? this.clientes : this.notDeleted
     const cliente = itens.find((item) => item.documento.equals(documento))
     return Promise.resolve(cliente ?? null)
   }
 
   list(page: number, rpp: number): Promise<Page<Cliente>> {
-    const list = this.ativos.slice((page - 1) * rpp, page * rpp + 1)
+    const list = this.notDeleted.slice((page - 1) * rpp, page * rpp + 1)
     return Promise.resolve(Page.create({ page, rpp, list }))
   }
 
-  private get ativos(): Cliente[] {
+  private get notDeleted(): Cliente[] {
     return this.clientes.filter((item) => !item.deletedAt)
   }
 }

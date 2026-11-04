@@ -4,6 +4,7 @@ import { ServicoController } from './controllers/servico.controller'
 import { ServicoRepository } from './domain/repositories/servico.repository'
 import { PrismaServicoRepository } from './infra/repositories/prisma-servico.repository'
 import { CreateServico } from './use-cases/create-servico.use-case'
+import { DeleteServico } from './use-cases/delete-servico.use-case'
 import { GetServico } from './use-cases/get-servico.use-case'
 import { ListServicos } from './use-cases/list-servicos.use-case'
 import { UpdateServico } from './use-cases/update-servico.use-case'
@@ -17,6 +18,7 @@ import { UpdateServico } from './use-cases/update-servico.use-case'
     ListServicos,
     GetServico,
     UpdateServico,
+    DeleteServico,
   ],
   exports: [ServicoRepository],
 })

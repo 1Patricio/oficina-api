@@ -224,3 +224,39 @@ describe('PUT /servicos/:id', () => {
     expect(trocaOleo.nome).toBe('Troca de óleo e filtro')
   })
 })
+
+describe('DELETE /servicos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(ServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e marca o serviço como excluído', async () => {
+    const trocaOleo = Servico.create('Troca de óleo', 'Troca com 1L de óleo', preco)
+
+    await repository.save(trocaOleo)
+
+    const response = await request(app.getHttpServer()).delete(`/servicos/${trocaOleo.id}`)
+
+    expect(response.status).toBe(204)
+    expect(trocaOleo.deletedAt).toBeInstanceOf(Date)
+  })
+})

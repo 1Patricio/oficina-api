@@ -11,6 +11,7 @@ export class Servico extends Entity {
     private _descricao: string,
     private _preco: Dinheiro,
     private _materiais: readonly MaterialNecessario[],
+    private _deletedAt: Date | null,
   ) {
     super(id)
     validateNome(_nome)
@@ -23,7 +24,7 @@ export class Servico extends Entity {
     preco: Dinheiro,
     materiais: MaterialNecessario[] = [],
   ): Servico {
-    return new Servico(randomUUID(), nome, descricao, preco, materiais)
+    return new Servico(randomUUID(), nome, descricao, preco, materiais, null)
   }
 
   static restore(
@@ -32,8 +33,9 @@ export class Servico extends Entity {
     descricao: string,
     preco: Dinheiro,
     materiais: MaterialNecessario[],
+    deletedAt: Date | null,
   ): Servico {
-    return new Servico(id, nome, descricao, preco, materiais)
+    return new Servico(id, nome, descricao, preco, materiais, deletedAt)
   }
 
   get nome(): string {
@@ -52,6 +54,10 @@ export class Servico extends Entity {
     return this._materiais
   }
 
+  get deletedAt(): Date | null {
+    return this._deletedAt
+  }
+
   update(
     nome: string,
     descricao: string,
@@ -65,6 +71,10 @@ export class Servico extends Entity {
     this._descricao = descricao
     this._preco = preco
     this._materiais = materiais
+  }
+
+  delete(data: Date = new Date()): void {
+    this._deletedAt = data
   }
 }
 

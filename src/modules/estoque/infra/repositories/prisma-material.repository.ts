@@ -39,7 +39,7 @@ export class PrismaMaterialRepository implements MaterialRepository {
 
   async isUsedInServico(id: string): Promise<boolean> {
     const servicoMaterial = await this.prisma.servicoMaterial.findFirst({
-      where: { materialId: id },
+      where: { materialId: id, servico: { deletedAt: null } },
     })
     return servicoMaterial !== null
   }

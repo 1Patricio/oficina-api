@@ -15,11 +15,16 @@ export class InMemoryServicoRepository extends ServicoRepository {
   }
 
   findById(id: string): Promise<Servico | null> {
-    return Promise.resolve(this.itens.get(id) ?? null)
+    const servico = this.notDeleted.find((item) => item.id === id)
+    return Promise.resolve(servico ?? null)
   }
 
   list(page: number, rpp: number): Promise<Page<Servico>> {
-    const list = this.servicos.slice((page - 1) * rpp, page * rpp + 1)
+    const list = this.notDeleted.slice((page - 1) * rpp, page * rpp + 1)
     return Promise.resolve(Page.create({ page, rpp, list }))
+  }
+
+  private get notDeleted(): Servico[] {
+    return this.servicos.filter((item) => !item.deletedAt)
   }
 }

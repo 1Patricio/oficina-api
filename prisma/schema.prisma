@@ -9,11 +9,12 @@ datasource db {
 }
 
 model Material {
-  id                    String   @id @db.Uuid
+  id                    String    @id @db.Uuid
   nome                  String
-  precoUnitarioCentavos Int      @map("preco_unitario_centavos")
+  precoUnitarioCentavos Int       @map("preco_unitario_centavos")
   estoque               Int
-  createdAt             DateTime @default(now()) @map("created_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  deletedAt             DateTime? @map("deleted_at")
 
   servicos             ServicoMaterial[]
   itensMaterial        ItemMaterial[]
@@ -23,13 +24,14 @@ model Material {
 }
 
 model Veiculo {
-  id        String   @id @db.Uuid
-  placa     String   @unique
+  id        String    @id @db.Uuid
+  placa     String    @unique
   ano       Int
   marca     String
   modelo    String
-  clienteId String?  @map("cliente_id") @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
+  clienteId String?   @map("cliente_id") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
 
   cliente Cliente? @relation(fields: [clienteId], references: [id])
 
@@ -39,10 +41,11 @@ model Veiculo {
 }
 
 model Cliente {
-  id        String   @id @db.Uuid
-  documento String   @unique
+  id        String    @id @db.Uuid
+  documento String    @unique
   nome      String
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
 
   veiculos      Veiculo[]
   ordensServico OrdemServico[]
@@ -51,11 +54,12 @@ model Cliente {
 }
 
 model Servico {
-  id            String   @id @db.Uuid
+  id            String    @id @db.Uuid
   nome          String
   descricao     String
-  precoCentavos Int      @map("preco_centavos")
-  createdAt     DateTime @default(now()) @map("created_at")
+  precoCentavos Int       @map("preco_centavos")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  deletedAt     DateTime? @map("deleted_at")
 
   materiais    ServicoMaterial[]
   itensServico ItemServico[]

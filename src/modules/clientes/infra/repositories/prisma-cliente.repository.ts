@@ -14,6 +14,7 @@ export class PrismaClienteRepository implements ClienteRepository {
     const data = {
       nome: cliente.nome,
       documento: cliente.documento.value,
+      deletedAt: cliente.deletedAt,
     }
 
     await this.prisma.cliente.upsert({
@@ -24,18 +25,26 @@ export class PrismaClienteRepository implements ClienteRepository {
   }
 
   async findById(id: string): Promise<Cliente | null> {
-    const cliente = await this.prisma.cliente.findUnique({ where: { id } })
+    const cliente = await this.prisma.cliente.findUnique({ where: { id, deletedAt: null } })
     return cliente ? toDomain(cliente) : null
   }
 
-  async findByDocumento(documento: Documento): Promise<Cliente | null> {
-    const cliente = await this.prisma.cliente.findUnique({ where: { documento: documento.value } })
+  async findByDocumento(
+    documento: Documento,
+    options?: { withDeleted?: boolean },
+  ): Promise<Cliente | null> {
+    const cliente = await this.prisma.cliente.findUnique({
+      where: {
+        documento: documento.value,
+        deletedAt: options?.withDeleted ? undefined : null,
+      },
+    })
     return cliente ? toDomain(cliente) : null
   }
 
   async list(page: number, rpp: number, term?: string): Promise<Page<Cliente>> {
     const clientes = await this.prisma.cliente.findMany({
-      where: { nome: { contains: term, mode: 'insensitive' } },
+      where: { nome: { contains: term, mode: 'insensitive' }, deletedAt: null },
       orderBy: { nome: 'asc' },
       skip: (page - 1) * rpp,
       take: rpp + 1,
@@ -45,5 +54,10 @@ export class PrismaClienteRepository implements ClienteRepository {
 }
 
 function toDomain(cliente: ClienteModel): Cliente {
-  return Cliente.restore(cliente.id, Documento.create(cliente.documento), cliente.nome)
+  return Cliente.restore(
+    cliente.id,
+    Documento.create(cliente.documento),
+    cliente.nome,
+    cliente.deletedAt,
+  )
 }

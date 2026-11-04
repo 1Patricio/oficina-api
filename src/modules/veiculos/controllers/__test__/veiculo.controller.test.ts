@@ -221,3 +221,77 @@ describe('GET /veiculos/:id', () => {
     expect(response.body.message).toBe('Veículo não encontrado.')
   })
 })
+
+describe('PUT /veiculos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryVeiculoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryVeiculoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(VeiculoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e atualiza o veículo', async () => {
+    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol')
+
+    await repository.save(gol)
+
+    const response = await request(app.getHttpServer())
+      .put(`/veiculos/${gol.id}`)
+      .send({ ...fakeVeiculo, ano: 2011 })
+
+    expect(response.status).toBe(204)
+    expect(gol.ano).toBe(2011)
+  })
+})
+
+describe('DELETE /veiculos/:id', () => {
+  let app: INestApplication
+  let repository: InMemoryVeiculoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryVeiculoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(VeiculoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e marca o veículo como excluído', async () => {
+    const gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol')
+
+    await repository.save(gol)
+
+    const response = await request(app.getHttpServer()).delete(`/veiculos/${gol.id}`)
+
+    expect(response.status).toBe(204)
+    expect(gol.deletedAt).toBeInstanceOf(Date)
+  })
+})

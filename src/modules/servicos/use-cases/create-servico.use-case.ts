@@ -33,10 +33,13 @@ export class CreateServico {
         MaterialNecessario.create(materialId, quantidade),
       ),
     )
-    const encontrados = await Promise.all(
-      servico.materiais.map(({ materialId }) => this.materialRepository.findById(materialId)),
-    )
-    if (encontrados.includes(null)) throw new NotFoundError('Material não encontrado.')
+    const materialIds = servico.materiais.map((material) => material.materialId)
+    const existingMateriais = await this.materialRepository.findManyByIds(materialIds)
+
+    if (existingMateriais.length !== materialIds.length) {
+      throw new NotFoundError('Material não encontrado.')
+    }
+
     await this.servicoRepository.save(servico)
     return { id: servico.id }
   }

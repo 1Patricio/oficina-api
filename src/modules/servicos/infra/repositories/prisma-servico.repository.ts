@@ -16,6 +16,7 @@ export class PrismaServicoRepository implements ServicoRepository {
       nome: servico.nome,
       descricao: servico.descricao,
       precoCentavos: servico.preco.cents,
+      deletedAt: servico.deletedAt,
     }
 
     const materiais = servico.materiais.map(({ materialId, quantidade }) => ({
@@ -32,7 +33,7 @@ export class PrismaServicoRepository implements ServicoRepository {
 
   async findById(id: string): Promise<Servico | null> {
     const servico = await this.prisma.servico.findUnique({
-      where: { id },
+      where: { id, deletedAt: null },
       include: { materiais: true },
     })
     return servico ? toDomain(servico) : null
@@ -40,7 +41,7 @@ export class PrismaServicoRepository implements ServicoRepository {
 
   async list(page: number, rpp: number, term?: string): Promise<Page<Servico>> {
     const servicos = await this.prisma.servico.findMany({
-      where: { nome: { contains: term, mode: 'insensitive' } },
+      where: { nome: { contains: term, mode: 'insensitive' }, deletedAt: null },
       include: { materiais: true },
       orderBy: { nome: 'asc' },
       skip: (page - 1) * rpp,
@@ -59,5 +60,6 @@ function toDomain(servico: ServicoModel & { materiais: ServicoMaterialModel[] })
     servico.materiais.map(({ materialId, quantidade }) =>
       MaterialNecessario.create(materialId, quantidade),
     ),
+    servico.deletedAt,
   )
 }

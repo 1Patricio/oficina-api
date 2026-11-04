@@ -30,9 +30,29 @@ export class CreateVeiculo {
     if (clienteId && !(await this.clienteRepository.findById(clienteId))) {
       throw new NotFoundError('Cliente não encontrado.')
     }
-    if (await this.veiculoRepository.findByPlaca(veiculo.placa)) {
+
+    const existingVeiculo = await this.veiculoRepository.findByPlaca(veiculo.placa, {
+      withDeleted: true,
+    })
+
+    if (existingVeiculo && !existingVeiculo.deletedAt) {
       throw new ConflictError('Veículo já cadastrado.')
     }
+
+    if (existingVeiculo) {
+      const reativado = Veiculo.restore(
+        existingVeiculo.id,
+        veiculo.placa,
+        ano,
+        marca,
+        modelo,
+        veiculo.clienteId,
+        null,
+      )
+      await this.veiculoRepository.save(reativado)
+      return { id: reativado.id }
+    }
+
     await this.veiculoRepository.save(veiculo)
     return { id: veiculo.id }
   }

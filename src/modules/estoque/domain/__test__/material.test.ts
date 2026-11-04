@@ -38,17 +38,20 @@ describe('Material', () => {
 
   it('restaura com o id e os dados informados', () => {
     const id = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
-    const material = Material.restore(id, 'Filtro de óleo', preco, 5)
+    const deletedAt = new Date('2026-10-30T12:00:00Z')
+    const material = Material.restore(id, 'Filtro de óleo', preco, 5, deletedAt)
+
     expect(material.id).toBe(id)
     expect(material.nome).toBe('Filtro de óleo')
     expect(material.precoUnitario.equals(preco)).toBe(true)
     expect(material.estoque).toBe(5)
+    expect(material.deletedAt).toBe(deletedAt)
   })
 
   it('rejeita restaurar com dados inválidos', () => {
     const id = '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d'
-    expect(() => Material.restore(id, '  ', preco, 5)).toThrow(DomainError)
-    expect(() => Material.restore(id, 'Filtro de óleo', preco, -1)).toThrow(DomainError)
+    expect(() => Material.restore(id, '  ', preco, 5, null)).toThrow(DomainError)
+    expect(() => Material.restore(id, 'Filtro de óleo', preco, -1, null)).toThrow(DomainError)
   })
 
   it('remove do estoque', () => {
@@ -87,5 +90,32 @@ describe('Material', () => {
     expect(() => material.addEstoque(0)).toThrow(DomainError)
     expect(() => material.addEstoque(-1)).toThrow(DomainError)
     expect(() => material.addEstoque(1.5)).toThrow(DomainError)
+  })
+
+  it('atualiza nome, preço unitário e estoque', () => {
+    const material = criarFiltro(10)
+    const outroPreco = Dinheiro.fromCents(5290)
+
+    material.update('Filtro de ar', outroPreco, 3)
+
+    expect(material.nome).toBe('Filtro de ar')
+    expect(material.precoUnitario.equals(outroPreco)).toBe(true)
+    expect(material.estoque).toBe(3)
+  })
+
+  it('rejeita atualizar com dados inválidos', () => {
+    const material = criarFiltro(10)
+
+    expect(() => material.update('  ', preco, 3)).toThrow(DomainError)
+    expect(() => material.update('Filtro de ar', preco, -1)).toThrow(DomainError)
+  })
+
+  it('marca a data da exclusão', () => {
+    const material = Material.create('Filtro de óleo', preco, 5)
+    const data = new Date('2026-10-30T12:00:00Z')
+
+    material.delete(data)
+
+    expect(material.deletedAt).toBe(data)
   })
 })

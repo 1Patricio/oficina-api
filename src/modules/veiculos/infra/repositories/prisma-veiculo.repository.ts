@@ -17,6 +17,7 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
       marca: veiculo.marca,
       modelo: veiculo.modelo,
       clienteId: veiculo.clienteId,
+      deletedAt: veiculo.deletedAt,
     }
 
     await this.prisma.veiculo.upsert({
@@ -27,25 +28,28 @@ export class PrismaVeiculoRepository implements VeiculoRepository {
   }
 
   async findById(id: string): Promise<Veiculo | null> {
-    const veiculo = await this.prisma.veiculo.findUnique({ where: { id } })
+    const veiculo = await this.prisma.veiculo.findUnique({ where: { id, deletedAt: null } })
     return veiculo ? toDomain(veiculo) : null
   }
 
-  async findByPlaca(placa: Placa): Promise<Veiculo | null> {
-    const veiculo = await this.prisma.veiculo.findUnique({ where: { placa: placa.value } })
+  async findByPlaca(placa: Placa, options?: { withDeleted?: boolean }): Promise<Veiculo | null> {
+    const veiculo = await this.prisma.veiculo.findUnique({
+      where: { placa: placa.value, deletedAt: options?.withDeleted ? undefined : null },
+    })
     return veiculo ? toDomain(veiculo) : null
   }
 
   async list(page: number, rpp: number, term?: string): Promise<Page<Veiculo>> {
     const veiculos = await this.prisma.veiculo.findMany({
-      where: term
-        ? {
-            OR: [
+      where: {
+        deletedAt: null,
+        OR: term
+          ? [
               { marca: { contains: term, mode: 'insensitive' } },
               { modelo: { contains: term, mode: 'insensitive' } },
-            ],
-          }
-        : undefined,
+            ]
+          : undefined,
+      },
       orderBy: [{ marca: 'asc' }, { modelo: 'asc' }],
       skip: (page - 1) * rpp,
       take: rpp + 1,
@@ -62,5 +66,6 @@ function toDomain(veiculo: VeiculoModel): Veiculo {
     veiculo.marca,
     veiculo.modelo,
     veiculo.clienteId,
+    veiculo.deletedAt,
   )
 }

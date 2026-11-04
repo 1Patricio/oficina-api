@@ -16,16 +16,22 @@ export class InMemoryVeiculoRepository extends VeiculoRepository {
   }
 
   findById(id: string): Promise<Veiculo | null> {
-    return Promise.resolve(this.itens.get(id) ?? null)
+    const veiculo = this.notDeleted.find((item) => item.id === id)
+    return Promise.resolve(veiculo ?? null)
   }
 
-  findByPlaca(placa: Placa): Promise<Veiculo | null> {
-    const veiculo = this.veiculos.find((item) => item.placa.equals(placa))
+  findByPlaca(placa: Placa, options?: { withDeleted?: boolean }): Promise<Veiculo | null> {
+    const itens = options?.withDeleted ? this.veiculos : this.notDeleted
+    const veiculo = itens.find((item) => item.placa.equals(placa))
     return Promise.resolve(veiculo ?? null)
   }
 
   list(page: number, rpp: number): Promise<Page<Veiculo>> {
-    const list = this.veiculos.slice((page - 1) * rpp, page * rpp + 1)
+    const list = this.notDeleted.slice((page - 1) * rpp, page * rpp + 1)
     return Promise.resolve(Page.create({ page, rpp, list }))
+  }
+
+  private get notDeleted(): Veiculo[] {
+    return this.veiculos.filter((item) => !item.deletedAt)
   }
 }

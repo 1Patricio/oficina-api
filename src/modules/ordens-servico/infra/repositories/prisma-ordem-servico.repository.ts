@@ -91,6 +91,15 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
     return ordem ? toDomain(ordem) : null
   }
 
+  async averageTempoExecucaoMinutos(): Promise<number | null> {
+    const [{ minutos }] = await this.client.$queryRaw<{ minutos: number | null }[]>`
+      SELECT AVG(EXTRACT(EPOCH FROM data_finalizacao - data_inicio) / 60)::float8 AS minutos
+      FROM ordens_servico
+      WHERE data_finalizacao IS NOT NULL
+    `
+    return minutos
+  }
+
   async list(page: number, rpp: number, status?: StatusOrdemServico): Promise<Page<OrdemServico>> {
     const ordens = await this.client.ordemServico.findMany({
       where: { status },

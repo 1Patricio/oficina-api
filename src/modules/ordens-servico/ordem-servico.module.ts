@@ -12,6 +12,7 @@ import { EntregarOrdemServico } from './use-cases/entregar-ordem-servico.use-cas
 import { EnviarOrcamento } from './use-cases/enviar-orcamento.use-case'
 import { FinalizarOrdemServico } from './use-cases/finalizar-ordem-servico.use-case'
 import { GetOrdemServico } from './use-cases/get-ordem-servico.use-case'
+import { GetTempoMedio } from './use-cases/get-tempo-medio.use-case'
 import { IncluirItens } from './use-cases/incluir-itens.use-case'
 import { IniciarDiagnostico } from './use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
@@ -25,6 +26,7 @@ import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
     CreateOrdemServico,
     ListOrdemServico,
     GetOrdemServico,
+    GetTempoMedio,
     IncluirItens,
     IniciarDiagnostico,
     EnviarOrcamento,

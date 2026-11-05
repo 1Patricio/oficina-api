@@ -5,6 +5,7 @@ import type { StatusOrdemServico } from '../../domain/status-ordem-servico'
 
 export class InMemoryOrdemServicoRepository extends OrdemServicoRepository {
   private readonly itens = new Map<string, OrdemServico>()
+  tempoMedioExecucaoMinutos: number | null = null
 
   get ordens(): OrdemServico[] {
     return [...this.itens.values()]
@@ -17,6 +18,10 @@ export class InMemoryOrdemServicoRepository extends OrdemServicoRepository {
 
   findById(id: string): Promise<OrdemServico | null> {
     return Promise.resolve(this.itens.get(id) ?? null)
+  }
+
+  averageTempoExecucaoMinutos(): Promise<number | null> {
+    return Promise.resolve(this.tempoMedioExecucaoMinutos)
   }
 
   list(page: number, rpp: number, status?: StatusOrdemServico): Promise<Page<OrdemServico>> {

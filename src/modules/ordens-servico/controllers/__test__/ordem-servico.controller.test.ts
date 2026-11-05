@@ -591,3 +591,37 @@ describe('POST /ordens-servico/:id/entregar', () => {
     expect(ordem.status).toBe(StatusOrdemServico.ENTREGUE)
   })
 })
+
+describe('GET /ordens-servico/tempo-medio', () => {
+  let app: INestApplication
+  let repository: InMemoryOrdemServicoRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryOrdemServicoRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 200 com o tempo médio em minutos', async () => {
+    repository.tempoMedioExecucaoMinutos = 90
+
+    const response = await request(app.getHttpServer()).get('/ordens-servico/tempo-medio')
+
+    expect(response.status).toBe(200)
+    expect(response.body).toEqual({ tempoMedioMinutos: 90 })
+  })
+})

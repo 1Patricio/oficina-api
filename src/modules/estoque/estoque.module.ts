@@ -6,6 +6,7 @@ import { CreateMaterial } from './use-cases/create-material.use-case'
 import { DeleteMaterial } from './use-cases/delete-material.use-case'
 import { GetMaterial } from './use-cases/get-material.use-case'
 import { ListMateriais } from './use-cases/list-materiais.use-case'
+import { ReporEstoque } from './use-cases/repor-estoque.use-case'
 import { UpdateMaterial } from './use-cases/update-material.use-case'
 
 @Module({
@@ -17,6 +18,7 @@ import { UpdateMaterial } from './use-cases/update-material.use-case'
     GetMaterial,
     UpdateMaterial,
     DeleteMaterial,
+    ReporEstoque,
   ],
   exports: [MaterialRepository],
 })

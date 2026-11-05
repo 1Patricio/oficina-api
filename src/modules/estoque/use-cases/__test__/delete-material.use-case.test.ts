@@ -32,6 +32,13 @@ describe('DeleteMaterial', () => {
     expect(filtro.deletedAt).toBeNull()
   })
 
+  it('rejeita material em ordem de serviço pendente sem excluir', async () => {
+    repository.usadosEmOrdemServicoPendente.add(filtro.id)
+
+    await expect(deleteMaterial.execute({ materialId: filtro.id })).rejects.toThrow(ConflictError)
+    expect(filtro.deletedAt).toBeNull()
+  })
+
   it('rejeita material inexistente', async () => {
     await expect(
       deleteMaterial.execute({ materialId: '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d' }),

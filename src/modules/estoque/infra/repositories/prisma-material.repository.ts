@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import type { Prisma } from '../../../../generated/prisma/client'
+import { StatusOrdemServico } from '../../../../generated/prisma/enums'
 import type { MaterialModel } from '../../../../generated/prisma/models'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { Page } from '../../../../shared/domain/page'
@@ -10,6 +12,10 @@ import { MaterialRepository } from '../../domain/repositories/material.repositor
 export class PrismaMaterialRepository implements MaterialRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  private get client(): Prisma.TransactionClient {
+    return this.prisma.getClient()
+  }
+
   async save(material: Material): Promise<void> {
     const data = {
       nome: material.nome,
@@ -18,7 +24,7 @@ export class PrismaMaterialRepository implements MaterialRepository {
       deletedAt: material.deletedAt,
     }
 
-    await this.prisma.material.upsert({
+    await this.client.material.upsert({
       where: { id: material.id },
       create: { id: material.id, ...data },
       update: data,
@@ -26,26 +32,45 @@ export class PrismaMaterialRepository implements MaterialRepository {
   }
 
   async findById(id: string): Promise<Material | null> {
-    const material = await this.prisma.material.findUnique({ where: { id, deletedAt: null } })
+    const material = await this.client.material.findUnique({ where: { id, deletedAt: null } })
     return material ? toDomain(material) : null
   }
 
   async findManyByIds(ids: string[]): Promise<Material[]> {
-    const materiais = await this.prisma.material.findMany({
+    const materiais = await this.client.material.findMany({
       where: { id: { in: ids }, deletedAt: null },
     })
     return materiais.map((material) => toDomain(material))
   }
 
   async isUsedInServico(id: string): Promise<boolean> {
-    const servicoMaterial = await this.prisma.servicoMaterial.findFirst({
+    const servicoMaterial = await this.client.servicoMaterial.findFirst({
       where: { materialId: id, servico: { deletedAt: null } },
     })
     return servicoMaterial !== null
   }
 
+  async isUsedInOrdemServicoPendente(id: string): Promise<boolean> {
+    const ordemServico = await this.client.ordemServico.findFirst({
+      where: {
+        status: {
+          in: [
+            StatusOrdemServico.RECEBIDA,
+            StatusOrdemServico.DIAGNOSTICO,
+            StatusOrdemServico.AGUARDANDO_APROVACAO,
+          ],
+        },
+        OR: [
+          { materiais: { some: { materialId: id } } },
+          { servicos: { some: { materiais: { some: { materialId: id } } } } },
+        ],
+      },
+    })
+    return ordemServico !== null
+  }
+
   async list(page: number, rpp: number, term?: string): Promise<Page<Material>> {
-    const materiais = await this.prisma.material.findMany({
+    const materiais = await this.client.material.findMany({
       where: { nome: { contains: term, mode: 'insensitive' }, deletedAt: null },
       orderBy: { nome: 'asc' },
       skip: (page - 1) * rpp,

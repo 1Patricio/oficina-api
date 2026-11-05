@@ -20,6 +20,10 @@ export class DeleteMaterial {
       throw new ConflictError('Material vinculado a serviços.')
     }
 
+    if (await this.materialRepository.isUsedInOrdemServicoPendente(materialId)) {
+      throw new ConflictError('Material vinculado a ordens de serviço pendentes.')
+    }
+
     material.delete()
     await this.materialRepository.save(material)
   }

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { Dinheiro } from '../../../shared/domain/dinheiro'
 import { DomainError } from '../../../shared/domain/domain-error'
 import { Entity } from '../../../shared/domain/entity'
+import { MaterialNecessario } from '../../servicos/domain/material-necessario'
 import type { ItemMaterial } from './item-material'
 import type { ItemServico } from './item-servico'
 import { Orcamento } from './orcamento'
@@ -98,6 +99,20 @@ export class OrdemServico extends Entity {
       Dinheiro.fromCents(0),
     )
     return this._materiais.reduce((total, item) => total.add(item.subtotal), servicos)
+  }
+
+  get materiaisNecessarios(): MaterialNecessario[] {
+    const materiaisDosServicos = this._servicos.flatMap((item) => item.materiais)
+    const quantidades = new Map<string, number>()
+
+    for (const material of [...materiaisDosServicos, ...this._materiais]) {
+      const quantidade = quantidades.get(material.materialId) ?? 0
+      quantidades.set(material.materialId, quantidade + material.quantidade)
+    }
+
+    return Array.from(quantidades, ([materialId, quantidade]) =>
+      MaterialNecessario.create(materialId, quantidade),
+    )
   }
 
   incluirServico(servico: ItemServico): void {

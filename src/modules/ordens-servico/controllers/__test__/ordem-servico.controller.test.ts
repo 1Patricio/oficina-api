@@ -3,9 +3,11 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { InMemoryTransactionManager } from '../../../../shared/__test__/double/in-memory-transaction-manager'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { Documento } from '../../../../shared/domain/documento'
 import { Placa } from '../../../../shared/domain/placa'
+import { TransactionManager } from '../../../../shared/domain/transaction-manager'
 import { InMemoryClienteRepository } from '../../../clientes/__test__/double/in-memory-cliente.repository'
 import { Cliente } from '../../../clientes/domain/cliente'
 import { ClienteRepository } from '../../../clientes/domain/repositories/cliente.repository'
@@ -429,9 +431,13 @@ describe('POST /ordens-servico/:id/itens', () => {
 describe('POST /ordens-servico/:id/aprovar-orcamento', () => {
   let app: INestApplication
   let repository: InMemoryOrdemServicoRepository
+  let filtro: Material
 
   beforeEach(async () => {
     repository = new InMemoryOrdemServicoRepository()
+    const materialRepository = new InMemoryMaterialRepository()
+    filtro = Material.restore(materialId, 'Filtro de óleo', Dinheiro.fromReais(25), 10, null)
+    await materialRepository.save(filtro)
 
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
@@ -440,6 +446,10 @@ describe('POST /ordens-servico/:id/aprovar-orcamento', () => {
       .useValue({})
       .overrideProvider(OrdemServicoRepository)
       .useValue(repository)
+      .overrideProvider(MaterialRepository)
+      .useValue(materialRepository)
+      .overrideProvider(TransactionManager)
+      .useValue(new InMemoryTransactionManager())
       .compile()
 
     app = moduleRef.createNestApplication()
@@ -463,6 +473,7 @@ describe('POST /ordens-servico/:id/aprovar-orcamento', () => {
     expect(ordem.orcamentos.map((orcamento) => orcamento.status)).toEqual([
       StatusOrcamento.APROVADO,
     ])
+    expect(filtro.estoque).toBe(8)
   })
 })
 

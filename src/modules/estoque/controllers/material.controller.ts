@@ -15,9 +15,11 @@ import { CreateMaterial } from '../use-cases/create-material.use-case'
 import { DeleteMaterial } from '../use-cases/delete-material.use-case'
 import { GetMaterial } from '../use-cases/get-material.use-case'
 import { ListMateriais } from '../use-cases/list-materiais.use-case'
+import { ReporEstoque } from '../use-cases/repor-estoque.use-case'
 import { UpdateMaterial } from '../use-cases/update-material.use-case'
 import { CreateMaterialDTO } from './dtos/create-material.dto'
 import { ListMateriaisQueryDTO } from './dtos/list-materiais-query.dto'
+import { ReporEstoqueDTO } from './dtos/repor-estoque.dto'
 import { UpdateMaterialDTO } from './dtos/update-material.dto'
 
 @Controller('/materiais')
@@ -36,6 +38,9 @@ export class MaterialController {
 
   @Inject(DeleteMaterial)
   private readonly deleteMaterial: DeleteMaterial
+
+  @Inject(ReporEstoque)
+  private readonly reporEstoque: ReporEstoque
 
   @Post('/')
   create(@Body() material: CreateMaterialDTO) {
@@ -62,5 +67,11 @@ export class MaterialController {
   @HttpCode(204)
   delete(@Param('id', ParseIdPipe) materialId: string) {
     return this.deleteMaterial.execute({ materialId })
+  }
+
+  @Post('/:id/reposicao')
+  @HttpCode(204)
+  repor(@Param('id', ParseIdPipe) materialId: string, @Body() reposicao: ReporEstoqueDTO) {
+    return this.reporEstoque.execute({ materialId, ...reposicao })
   }
 }

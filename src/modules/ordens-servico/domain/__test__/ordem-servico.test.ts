@@ -1,5 +1,6 @@
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { DomainError } from '../../../../shared/domain/domain-error'
+import { MaterialNecessario } from '../../../servicos/domain/material-necessario'
 import { ItemMaterial } from '../item-material'
 import { ItemServico } from '../item-servico'
 import { Orcamento } from '../orcamento'
@@ -80,6 +81,22 @@ describe('OrdemServico', () => {
     expect(ordem.materiais).toHaveLength(1)
     expect(ordem.materiais[0].quantidade).toBe(2)
     expect(ordem.total.cents).toBe(22000)
+  })
+
+  it('soma por material o que vem dos serviços e dos itens avulsos', () => {
+    const ordem = OrdemServico.create(clienteId, veiculoId, dataRecebimento)
+    ordem.incluirServico(
+      ItemServico.create('servico-1', 'Troca de óleo', Dinheiro.fromCents(15000), [
+        MaterialNecessario.create('material-1', 4),
+      ]),
+    )
+    ordem.incluirMaterial(oleo)
+    ordem.incluirMaterial(filtro)
+
+    expect(ordem.materiaisNecessarios).toEqual([
+      MaterialNecessario.create('material-1', 5),
+      MaterialNecessario.create('material-2', 2),
+    ])
   })
 
   it('rejeita incluir o mesmo serviço duas vezes', () => {

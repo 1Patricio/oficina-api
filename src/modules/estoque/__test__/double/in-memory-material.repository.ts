@@ -5,6 +5,7 @@ import { MaterialRepository } from '../../domain/repositories/material.repositor
 export class InMemoryMaterialRepository extends MaterialRepository {
   private readonly itens = new Map<string, Material>()
   readonly usadosEmServico = new Set<string>()
+  readonly usadosEmOrdemServicoPendente = new Set<string>()
 
   get materiais(): Material[] {
     return [...this.itens.values()]
@@ -26,6 +27,10 @@ export class InMemoryMaterialRepository extends MaterialRepository {
 
   isUsedInServico(id: string): Promise<boolean> {
     return Promise.resolve(this.usadosEmServico.has(id))
+  }
+
+  isUsedInOrdemServicoPendente(id: string): Promise<boolean> {
+    return Promise.resolve(this.usadosEmOrdemServicoPendente.has(id))
   }
 
   list(page: number, rpp: number): Promise<Page<Material>> {

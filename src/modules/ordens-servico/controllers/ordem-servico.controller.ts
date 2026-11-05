@@ -6,6 +6,7 @@ import { EntregarOrdemServico } from '../use-cases/entregar-ordem-servico.use-ca
 import { EnviarOrcamento } from '../use-cases/enviar-orcamento.use-case'
 import { FinalizarOrdemServico } from '../use-cases/finalizar-ordem-servico.use-case'
 import { GetOrdemServico } from '../use-cases/get-ordem-servico.use-case'
+import { GetTempoMedio } from '../use-cases/get-tempo-medio.use-case'
 import { IncluirItens } from '../use-cases/incluir-itens.use-case'
 import { IniciarDiagnostico } from '../use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from '../use-cases/list-ordem-servico.use-case'
@@ -24,6 +25,9 @@ export class OrdemServicoController {
 
   @Inject()
   private readonly getOrdemServico: GetOrdemServico
+
+  @Inject()
+  private readonly getTempoMedio: GetTempoMedio
 
   @Inject()
   private readonly incluirItens: IncluirItens
@@ -54,6 +58,11 @@ export class OrdemServicoController {
   @Get('/')
   list(@Query() query: ListOrdensServicoQueryDTO) {
     return this.listOrdemServico.execute(query)
+  }
+
+  @Get('/tempo-medio')
+  tempoMedio() {
+    return this.getTempoMedio.execute()
   }
 
   @Get('/:id')

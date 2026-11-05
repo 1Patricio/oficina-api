@@ -3,7 +3,9 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { InMemoryTransactionManager } from '../../../../shared/__test__/double/in-memory-transaction-manager'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
+import { TransactionManager } from '../../../../shared/domain/transaction-manager'
 import { InMemoryMaterialRepository } from '../../__test__/double/in-memory-material.repository'
 import { Material } from '../../domain/material'
 import { MaterialRepository } from '../../domain/repositories/material.repository'
@@ -266,5 +268,55 @@ describe('DELETE /materiais/:id', () => {
 
     expect(response.status).toBe(204)
     expect(filtro.deletedAt).toBeInstanceOf(Date)
+  })
+})
+
+describe('POST /materiais/:id/reposicao', () => {
+  let app: INestApplication
+  let repository: InMemoryMaterialRepository
+
+  beforeEach(async () => {
+    repository = new InMemoryMaterialRepository()
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(MaterialRepository)
+      .useValue(repository)
+      .overrideProvider(TransactionManager)
+      .useValue(new InMemoryTransactionManager())
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e soma a quantidade ao estoque', async () => {
+    const filtro = Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10)
+    await repository.save(filtro)
+
+    const response = await request(app.getHttpServer())
+      .post(`/materiais/${filtro.id}/reposicao`)
+      .send({ quantidade: 5 })
+
+    expect(response.status).toBe(204)
+    expect(filtro.estoque).toBe(15)
+  })
+
+  it('responde 400 quando a quantidade não é um inteiro', async () => {
+    const filtro = Material.create('Filtro de óleo', Dinheiro.fromCents(4590), 10)
+    await repository.save(filtro)
+
+    const response = await request(app.getHttpServer())
+      .post(`/materiais/${filtro.id}/reposicao`)
+      .send({ quantidade: 'cinco' })
+
+    expect(response.status).toBe(400)
   })
 })

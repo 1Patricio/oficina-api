@@ -5,5 +5,6 @@ import type { StatusOrdemServico } from '../status-ordem-servico'
 export abstract class OrdemServicoRepository {
   abstract save(ordem: OrdemServico): Promise<void>
   abstract findById(id: string): Promise<OrdemServico | null>
+  abstract averageTempoExecucaoMinutos(): Promise<number | null>
   abstract list(page: number, rpp: number, status?: StatusOrdemServico): Promise<Page<OrdemServico>>
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import type { Prisma } from '../../../../generated/prisma/client'
 import type {
   ItemMaterialModel,
   ItemServicoMaterialModel,
@@ -21,6 +22,10 @@ import { StatusOrdemServico } from '../../domain/status-ordem-servico'
 @Injectable()
 export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  private get client(): Prisma.TransactionClient {
+    return this.prisma.getClient()
+  }
 
   async save(ordem: OrdemServico): Promise<void> {
     const data = {
@@ -56,7 +61,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
       dataResposta,
     }))
 
-    await this.prisma.ordemServico.upsert({
+    await this.client.ordemServico.upsert({
       where: { id: ordem.id },
       create: {
         id: ordem.id,
@@ -75,7 +80,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
   }
 
   async findById(id: string): Promise<OrdemServico | null> {
-    const ordem = await this.prisma.ordemServico.findUnique({
+    const ordem = await this.client.ordemServico.findUnique({
       where: { id },
       include: {
         servicos: { include: { materiais: true } },
@@ -86,8 +91,17 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
     return ordem ? toDomain(ordem) : null
   }
 
+  async averageTempoExecucaoMinutos(): Promise<number | null> {
+    const [{ minutos }] = await this.client.$queryRaw<{ minutos: number | null }[]>`
+      SELECT AVG(EXTRACT(EPOCH FROM data_finalizacao - data_inicio) / 60)::float8 AS minutos
+      FROM ordens_servico
+      WHERE data_finalizacao IS NOT NULL
+    `
+    return minutos
+  }
+
   async list(page: number, rpp: number, status?: StatusOrdemServico): Promise<Page<OrdemServico>> {
-    const ordens = await this.prisma.ordemServico.findMany({
+    const ordens = await this.client.ordemServico.findMany({
       where: { status },
       include: {
         servicos: { include: { materiais: true } },

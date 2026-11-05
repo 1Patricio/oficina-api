@@ -1,7 +1,8 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from '../../generated/prisma/client'
+import { type Prisma, PrismaClient } from '../../generated/prisma/client'
+import { TransactionContext } from './transaction-context'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleDestroy {
@@ -11,6 +12,10 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
         connectionString: config.getOrThrow<string>('DATABASE_URL'),
       }),
     })
+  }
+
+  getClient(): Prisma.TransactionClient {
+    return TransactionContext.getClient() ?? this
   }
 
   async onModuleDestroy() {

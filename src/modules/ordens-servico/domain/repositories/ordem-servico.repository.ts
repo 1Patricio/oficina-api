@@ -7,4 +7,10 @@ export abstract class OrdemServicoRepository {
   abstract findById(id: string): Promise<OrdemServico | null>
   abstract averageTempoExecucaoMinutos(): Promise<number | null>
   abstract list(page: number, rpp: number, status?: StatusOrdemServico): Promise<Page<OrdemServico>>
+  abstract listByClienteAndVeiculo(
+    clienteId: string,
+    veiculoId: string,
+    page: number,
+    rpp: number,
+  ): Promise<Page<OrdemServico>>
 }

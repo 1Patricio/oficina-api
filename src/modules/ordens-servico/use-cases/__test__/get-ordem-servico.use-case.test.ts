@@ -36,6 +36,7 @@ describe('GetOrdemServico', () => {
 
     expect(detalhe).toEqual({
       id: ordem.id,
+      numero: 1,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.AGUARDANDO_APROVACAO,

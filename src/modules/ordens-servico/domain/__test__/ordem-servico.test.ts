@@ -208,6 +208,7 @@ describe('OrdemServico', () => {
 
     const ordem = OrdemServico.restore({
       id,
+      numero: 7,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.EXECUCAO,
@@ -222,6 +223,7 @@ describe('OrdemServico', () => {
 
     expect(ordem).toMatchObject({
       id,
+      numero: 7,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.EXECUCAO,

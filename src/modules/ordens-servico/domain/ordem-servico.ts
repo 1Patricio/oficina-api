@@ -10,6 +10,7 @@ import { StatusOrdemServico } from './status-ordem-servico'
 
 type RestoreProps = {
   id: string
+  numero: number
   clienteId: string
   veiculoId: string
   status: StatusOrdemServico
@@ -23,6 +24,7 @@ type RestoreProps = {
 }
 
 export class OrdemServico extends Entity {
+  private _numero: number | null = null
   private _status: StatusOrdemServico = StatusOrdemServico.RECEBIDA
   private readonly _servicos: ItemServico[] = []
   private readonly _materiais: ItemMaterial[] = []
@@ -55,6 +57,7 @@ export class OrdemServico extends Entity {
       props.veiculoId,
       props.dataRecebimento,
     )
+    ordem._numero = props.numero
     ordem._status = props.status
     ordem._dataInicio = props.dataInicio
     ordem._dataFinalizacao = props.dataFinalizacao
@@ -63,6 +66,11 @@ export class OrdemServico extends Entity {
     ordem._materiais.push(...props.materiais)
     ordem._orcamentos.push(...props.orcamentos)
     return ordem
+  }
+
+  get numero(): number {
+    if (this._numero === null) throw new Error('Ordem de serviço ainda não salva.')
+    return this._numero
   }
 
   get status(): StatusOrdemServico {
@@ -113,6 +121,10 @@ export class OrdemServico extends Entity {
     return Array.from(quantidades, ([materialId, quantidade]) =>
       MaterialNecessario.create(materialId, quantidade),
     )
+  }
+
+  atribuirNumero(numero: number): void {
+    this._numero = numero
   }
 
   incluirServico(servico: ItemServico): void {

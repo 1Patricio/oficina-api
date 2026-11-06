@@ -81,6 +81,7 @@ describe('GET /public/ordens-servico', () => {
       list: [
         {
           id: ordem.id,
+          numero: 1,
           status: StatusOrdemServico.RECEBIDA,
           dataRecebimento: '2026-10-01T10:00:00.000Z',
           dataInicio: null,

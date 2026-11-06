@@ -25,7 +25,11 @@ describe('UpdateVeiculo', () => {
   })
 
   it('salva o veículo com os dados informados e o cliente vinculado', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
 
     await clienteRepository.save(maria)
 

@@ -42,7 +42,7 @@ describe('CreateOrdemServico', () => {
       materialRepository,
     )
 
-    maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva', 'maria@email.com')
     await clienteRepository.save(maria)
     gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol', maria.id)
     await veiculoRepository.save(gol)
@@ -112,7 +112,7 @@ describe('CreateOrdemServico', () => {
   })
 
   it('rejeita veículo de outro cliente sem salvar', async () => {
-    const joao = Cliente.create(Documento.create('111.444.777-35'), 'João Souza')
+    const joao = Cliente.create(Documento.create('111.444.777-35'), 'João Souza', 'joao@email.com')
     await clienteRepository.save(joao)
 
     await expect(

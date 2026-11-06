@@ -4,6 +4,7 @@ import { EstoqueModule } from '../estoque/estoque.module'
 import { ServicoModule } from '../servicos/servico.module'
 import { VeiculoModule } from '../veiculos/veiculo.module'
 import { OrdemServicoController } from './controllers/ordem-servico.controller'
+import { OrdemServicoPublicController } from './controllers/ordem-servico-public.controller'
 import { OrdemServicoRepository } from './domain/repositories/ordem-servico.repository'
 import { PrismaOrdemServicoRepository } from './infra/repositories/prisma-ordem-servico.repository'
 import { AprovarOrcamento } from './use-cases/aprovar-orcamento.use-case'
@@ -16,15 +17,17 @@ import { GetTempoMedio } from './use-cases/get-tempo-medio.use-case'
 import { IncluirItens } from './use-cases/incluir-itens.use-case'
 import { IniciarDiagnostico } from './use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
+import { ListOrdensServicoPublic } from './use-cases/list-ordens-servico-public.use-case'
 import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
 
 @Module({
   imports: [ClienteModule, VeiculoModule, ServicoModule, EstoqueModule],
-  controllers: [OrdemServicoController],
+  controllers: [OrdemServicoController, OrdemServicoPublicController],
   providers: [
     { provide: OrdemServicoRepository, useClass: PrismaOrdemServicoRepository },
     CreateOrdemServico,
     ListOrdemServico,
+    ListOrdensServicoPublic,
     GetOrdemServico,
     GetTempoMedio,
     IncluirItens,

@@ -29,4 +29,17 @@ export class InMemoryOrdemServicoRepository extends OrdemServicoRepository {
     const list = filtradas.slice((page - 1) * rpp, page * rpp + 1)
     return Promise.resolve(Page.create({ page, rpp, list }))
   }
+
+  listByClienteAndVeiculo(
+    clienteId: string,
+    veiculoId: string,
+    page: number,
+    rpp: number,
+  ): Promise<Page<OrdemServico>> {
+    const ordens = this.ordens
+      .filter((ordem) => ordem.clienteId === clienteId && ordem.veiculoId === veiculoId)
+      .sort((ordemA, ordemB) => ordemB.dataRecebimento.getTime() - ordemA.dataRecebimento.getTime())
+    const list = ordens.slice((page - 1) * rpp, page * rpp + 1)
+    return Promise.resolve(Page.create({ page, rpp, list }))
+  }
 }

@@ -8,6 +8,7 @@ import { CreateCliente } from '../create-cliente.use-case'
 const fakeCliente = {
   documento: '529.982.247-25',
   nome: 'Maria Silva',
+  email: 'maria@email.com',
 }
 
 describe('CreateCliente', () => {
@@ -41,8 +42,12 @@ describe('CreateCliente', () => {
     expect(repository.clientes).toHaveLength(1)
   })
 
-  it('reativa o cliente excluído com o mesmo id e o nome informado', async () => {
-    const maria = Cliente.create(Documento.create(fakeCliente.documento), 'Maria Souza')
+  it('reativa o cliente excluído com o mesmo id e os dados informados', async () => {
+    const maria = Cliente.create(
+      Documento.create(fakeCliente.documento),
+      'Maria Souza',
+      'antigo@email.com',
+    )
     maria.delete()
     await repository.save(maria)
 
@@ -51,6 +56,7 @@ describe('CreateCliente', () => {
     expect(id).toBe(maria.id)
     const reativado = await repository.findById(id)
     expect(reativado?.nome).toBe('Maria Silva')
+    expect(reativado?.email).toBe('maria@email.com')
   })
 
   it('rejeita nome vazio sem salvar', async () => {

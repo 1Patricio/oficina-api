@@ -65,7 +65,11 @@ describe('POST /ordens-servico', () => {
     const servicoRepository = new InMemoryServicoRepository()
     const materialRepository = new InMemoryMaterialRepository()
 
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await clienteRepository.save(maria)
     gol = Veiculo.create(Placa.create('ABC1234'), 2010, 'Volkswagen', 'Gol', maria.id)
     await veiculoRepository.save(gol)

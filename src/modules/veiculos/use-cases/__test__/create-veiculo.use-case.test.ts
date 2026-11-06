@@ -39,7 +39,11 @@ describe('CreateVeiculo', () => {
   })
 
   it('vincula o veículo ao cliente informado', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await clienteRepository.save(maria)
 
     const { id } = await createVeiculo.execute({ ...fakeVeiculo, clienteId: maria.id })

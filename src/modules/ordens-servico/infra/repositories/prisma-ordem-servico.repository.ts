@@ -115,6 +115,27 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
 
     return Page.create({ page, rpp, list: ordens.map((ordem) => toDomain(ordem)) })
   }
+
+  async listByClienteAndVeiculo(
+    clienteId: string,
+    veiculoId: string,
+    page: number,
+    rpp: number,
+  ): Promise<Page<OrdemServico>> {
+    const ordens = await this.client.ordemServico.findMany({
+      where: { clienteId, veiculoId },
+      include: {
+        servicos: { include: { materiais: true } },
+        materiais: true,
+        orcamentos: { orderBy: [{ dataEnvio: 'asc' }, { id: 'asc' }] },
+      },
+      orderBy: [{ dataRecebimento: 'desc' }, { id: 'desc' }],
+      skip: (page - 1) * rpp,
+      take: rpp + 1,
+    })
+
+    return Page.create({ page, rpp, list: ordens.map((ordem) => toDomain(ordem)) })
+  }
 }
 
 function toDomain(

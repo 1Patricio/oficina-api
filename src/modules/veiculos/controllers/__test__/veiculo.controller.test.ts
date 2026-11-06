@@ -59,7 +59,11 @@ describe('POST /veiculos', () => {
   })
 
   it('responde 201 vinculando o veículo ao cliente', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await clienteRepository.save(maria)
 
     const response = await request(app.getHttpServer())

@@ -14,7 +14,7 @@ describe('UpdateCliente', () => {
     repository = new InMemoryClienteRepository()
     updateCliente = new UpdateCliente(repository)
 
-    maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva', 'maria@email.com')
 
     await repository.save(maria)
   })
@@ -43,7 +43,7 @@ describe('UpdateCliente', () => {
   })
 
   it('rejeita documento de outro cliente, mesmo excluído', async () => {
-    const joao = Cliente.create(Documento.create('111.444.777-35'), 'João Souza')
+    const joao = Cliente.create(Documento.create('111.444.777-35'), 'João Souza', 'joao@email.com')
     joao.delete()
 
     await repository.save(joao)

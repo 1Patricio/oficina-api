@@ -14,6 +14,7 @@ export class PrismaClienteRepository implements ClienteRepository {
     const data = {
       nome: cliente.nome,
       documento: cliente.documento.value,
+      email: cliente.email,
       deletedAt: cliente.deletedAt,
     }
 
@@ -58,6 +59,7 @@ function toDomain(cliente: ClienteModel): Cliente {
     cliente.id,
     Documento.create(cliente.documento),
     cliente.nome,
+    cliente.email,
     cliente.deletedAt,
   )
 }

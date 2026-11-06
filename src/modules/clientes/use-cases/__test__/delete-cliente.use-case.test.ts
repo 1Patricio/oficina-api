@@ -14,7 +14,11 @@ describe('DeleteCliente', () => {
   })
 
   it('marca o cliente como excluído sem apagar o registro', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await repository.save(maria)
 
     await deleteCliente.execute({ clienteId: maria.id })

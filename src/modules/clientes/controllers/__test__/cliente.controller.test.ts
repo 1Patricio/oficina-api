@@ -11,6 +11,7 @@ import { ClienteRepository } from '../../domain/repositories/cliente.repository'
 const fakeCliente = {
   documento: '529.982.247-25',
   nome: 'Maria Silva',
+  email: 'maria@email.com',
 }
 
 describe('POST /clientes', () => {
@@ -73,8 +74,14 @@ describe('GET /clientes', () => {
   })
 
   it('responde 200 com a página pedida e o documento em texto', async () => {
-    await repository.save(Cliente.create(Documento.create('111.444.777-35'), 'João Souza'))
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    await repository.save(
+      Cliente.create(Documento.create('111.444.777-35'), 'João Souza', 'joao@email.com'),
+    )
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
 
     await repository.save(maria)
 
@@ -115,7 +122,11 @@ describe('GET /clientes/:id', () => {
   })
 
   it('responde 200 com o cliente e o documento em texto', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await repository.save(maria)
 
     const response = await request(app.getHttpServer()).get(`/clientes/${maria.id}`)
@@ -159,7 +170,11 @@ describe('PUT /clientes/:id', () => {
   })
 
   it('responde 204 e atualiza o cliente', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
 
     await repository.save(maria)
 
@@ -198,7 +213,11 @@ describe('DELETE /clientes/:id', () => {
   })
 
   it('responde 204 e marca o cliente como excluído', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
 
     await repository.save(maria)
 

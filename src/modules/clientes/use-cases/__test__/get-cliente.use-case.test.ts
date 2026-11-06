@@ -14,7 +14,11 @@ describe('GetCliente', () => {
   })
 
   it('devolve o cliente com o documento em texto', async () => {
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await repository.save(maria)
 
     const cliente = await getCliente.execute({ clienteId: maria.id })

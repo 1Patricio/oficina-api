@@ -7,6 +7,7 @@ import { ClienteRepository } from '../domain/repositories/cliente.repository'
 type Request = {
   documento: string
   nome: string
+  email: string
 }
 
 type Response = {
@@ -17,8 +18,8 @@ type Response = {
 export class CreateCliente {
   constructor(private readonly clienteRepository: ClienteRepository) {}
 
-  async execute({ documento, nome }: Request): Promise<Response> {
-    const cliente = Cliente.create(Documento.create(documento), nome)
+  async execute({ documento, nome, email }: Request): Promise<Response> {
+    const cliente = Cliente.create(Documento.create(documento), nome, email)
     const existingCliente = await this.clienteRepository.findByDocumento(cliente.documento, {
       withDeleted: true,
     })
@@ -28,7 +29,7 @@ export class CreateCliente {
     }
 
     if (existingCliente) {
-      const reativado = Cliente.restore(existingCliente.id, cliente.documento, nome, null)
+      const reativado = Cliente.restore(existingCliente.id, cliente.documento, nome, email, null)
       await this.clienteRepository.save(reativado)
       return { id: reativado.id }
     }

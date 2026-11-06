@@ -8,18 +8,25 @@ export class Cliente extends Entity {
     id: string,
     private _documento: Documento,
     private _nome: string,
+    private _email: string | null,
     private _deletedAt: Date | null,
   ) {
     super(id)
     validateNome(_nome)
   }
 
-  static create(documento: Documento, nome: string): Cliente {
-    return new Cliente(randomUUID(), documento, nome, null)
+  static create(documento: Documento, nome: string, email: string): Cliente {
+    return new Cliente(randomUUID(), documento, nome, email, null)
   }
 
-  static restore(id: string, documento: Documento, nome: string, deletedAt: Date | null): Cliente {
-    return new Cliente(id, documento, nome, deletedAt)
+  static restore(
+    id: string,
+    documento: Documento,
+    nome: string,
+    email: string | null,
+    deletedAt: Date | null,
+  ): Cliente {
+    return new Cliente(id, documento, nome, email, deletedAt)
   }
 
   get documento(): Documento {
@@ -28,6 +35,10 @@ export class Cliente extends Entity {
 
   get nome(): string {
     return this._nome
+  }
+
+  get email(): string | null {
+    return this._email
   }
 
   get deletedAt(): Date | null {

@@ -6,7 +6,11 @@ import { ListClientes } from '../list-clientes.use-case'
 describe('ListClientes', () => {
   it('lista a página de clientes com o documento em texto', async () => {
     const repository = new InMemoryClienteRepository()
-    const maria = Cliente.create(Documento.create('529.982.247-25'), 'Maria Silva')
+    const maria = Cliente.create(
+      Documento.create('529.982.247-25'),
+      'Maria Silva',
+      'maria@email.com',
+    )
     await repository.save(maria)
 
     const clientes = await new ListClientes(repository).execute({ page: 1, rpp: 20 })

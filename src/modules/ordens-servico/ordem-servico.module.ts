@@ -22,6 +22,8 @@ import { IncluirItens } from './use-cases/incluir-itens.use-case'
 import { IniciarDiagnostico } from './use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from './use-cases/list-ordem-servico.use-case'
 import { ListOrdensServicoPublic } from './use-cases/list-ordens-servico-public.use-case'
+import { NotificarOrcamentoCliente } from './use-cases/notificar-orcamento-cliente'
+import { ReenviarOrcamento } from './use-cases/reenviar-orcamento.use-case'
 import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
 
 @Module({
@@ -48,7 +50,9 @@ import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
     GetTempoMedio,
     IncluirItens,
     IniciarDiagnostico,
+    NotificarOrcamentoCliente,
     EnviarOrcamento,
+    ReenviarOrcamento,
     AprovarOrcamento,
     RejeitarOrcamento,
     FinalizarOrdemServico,

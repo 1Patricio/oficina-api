@@ -1,5 +1,6 @@
 import {
   ArgumentsHost,
+  BadGatewayException,
   Catch,
   ConflictException,
   ExceptionFilter,
@@ -10,6 +11,7 @@ import type { Response } from 'express'
 import { ConflictError } from '../shared/domain/conflict-error'
 import { DomainError } from '../shared/domain/domain-error'
 import { NotFoundError } from '../shared/domain/not-found-error'
+import { NotificacaoError } from '../shared/domain/notificacao-error'
 
 @Catch(DomainError)
 export class DomainErrorFilter implements ExceptionFilter {
@@ -24,5 +26,6 @@ export class DomainErrorFilter implements ExceptionFilter {
 function toHttpException(error: DomainError) {
   if (error instanceof NotFoundError) return new NotFoundException(error.message)
   if (error instanceof ConflictError) return new ConflictException(error.message)
+  if (error instanceof NotificacaoError) return new BadGatewayException(error.message)
   return new UnprocessableEntityException(error.message)
 }

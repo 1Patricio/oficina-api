@@ -157,6 +157,11 @@ export class OrdemServico extends Entity {
     this._status = StatusOrdemServico.AGUARDANDO_APROVACAO
   }
 
+  reenviarOrcamento(): Orcamento {
+    this.exigirStatus(StatusOrdemServico.AGUARDANDO_APROVACAO)
+    return this._orcamentos[this._orcamentos.length - 1]
+  }
+
   aprovarOrcamento(data: Date = new Date()): void {
     this.exigirStatus(StatusOrdemServico.AGUARDANDO_APROVACAO)
     this.responderOrcamento((orcamento) => orcamento.aprovar(data))

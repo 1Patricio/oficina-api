@@ -8,13 +8,14 @@ type Request = {
   clienteId: string
   documento: string
   nome: string
+  email: string
 }
 
 @Injectable()
 export class UpdateCliente {
   constructor(private readonly clienteRepository: ClienteRepository) {}
 
-  async execute({ clienteId, documento, nome }: Request): Promise<void> {
+  async execute({ clienteId, documento, nome, email }: Request): Promise<void> {
     const cliente = await this.clienteRepository.findById(clienteId)
 
     if (!cliente) throw new NotFoundError('Cliente não encontrado.')
@@ -28,7 +29,7 @@ export class UpdateCliente {
       throw new ConflictError('Documento já cadastrado.')
     }
 
-    cliente.update(Documento.create(documento), nome)
+    cliente.update(Documento.create(documento), nome, email)
     await this.clienteRepository.save(cliente)
   }
 }

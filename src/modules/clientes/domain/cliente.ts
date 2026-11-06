@@ -45,11 +45,12 @@ export class Cliente extends Entity {
     return this._deletedAt
   }
 
-  update(documento: Documento, nome: string): void {
+  update(documento: Documento, nome: string, email: string): void {
     validateNome(nome)
 
     this._documento = documento
     this._nome = nome
+    this._email = email
   }
 
   delete(data: Date = new Date()): void {

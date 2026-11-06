@@ -13,7 +13,7 @@ describe('GetCliente', () => {
     getCliente = new GetCliente(repository)
   })
 
-  it('devolve o cliente com o documento em texto', async () => {
+  it('devolve o cliente com o documento em texto e o e-mail', async () => {
     const maria = Cliente.create(
       Documento.create('529.982.247-25'),
       'Maria Silva',
@@ -23,7 +23,12 @@ describe('GetCliente', () => {
 
     const cliente = await getCliente.execute({ clienteId: maria.id })
 
-    expect(cliente).toEqual({ id: maria.id, nome: 'Maria Silva', documento: '52998224725' })
+    expect(cliente).toEqual({
+      id: maria.id,
+      nome: 'Maria Silva',
+      documento: '52998224725',
+      email: 'maria@email.com',
+    })
   })
 
   it('rejeita cliente inexistente', async () => {

@@ -4,7 +4,7 @@ import { Cliente } from '../../domain/cliente'
 import { ListClientes } from '../list-clientes.use-case'
 
 describe('ListClientes', () => {
-  it('lista a página de clientes com o documento em texto', async () => {
+  it('lista a página de clientes com o documento em texto e o e-mail', async () => {
     const repository = new InMemoryClienteRepository()
     const maria = Cliente.create(
       Documento.create('529.982.247-25'),
@@ -19,7 +19,9 @@ describe('ListClientes', () => {
       page: 1,
       rpp: 20,
       more: false,
-      list: [{ id: maria.id, nome: 'Maria Silva', documento: '52998224725' }],
+      list: [
+        { id: maria.id, nome: 'Maria Silva', documento: '52998224725', email: 'maria@email.com' },
+      ],
     })
   })
 })

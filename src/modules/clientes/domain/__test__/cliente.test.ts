@@ -33,19 +33,20 @@ describe('Cliente', () => {
     expect(cliente.deletedAt).toBe(deletedAt)
   })
 
-  it('atualiza documento e nome', () => {
+  it('atualiza documento, nome e e-mail', () => {
     const cliente = Cliente.create(documento, 'Maria Silva', 'maria@email.com')
     const outroDocumento = Documento.create('111.444.777-35')
 
-    cliente.update(outroDocumento, 'Maria Souza')
+    cliente.update(outroDocumento, 'Maria Souza', 'maria.souza@email.com')
 
     expect(cliente.documento.equals(outroDocumento)).toBe(true)
     expect(cliente.nome).toBe('Maria Souza')
+    expect(cliente.email).toBe('maria.souza@email.com')
   })
 
   it('rejeita atualizar com nome vazio', () => {
     const cliente = Cliente.create(documento, 'Maria Silva', 'maria@email.com')
-    expect(() => cliente.update(documento, '  ')).toThrow(DomainError)
+    expect(() => cliente.update(documento, '  ', 'maria@email.com')).toThrow(DomainError)
   })
 
   it('marca a data da exclusão', () => {

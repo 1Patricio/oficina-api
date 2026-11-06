@@ -10,6 +10,7 @@ type Response = {
   id: string
   nome: string
   documento: string
+  email: string | null
 }
 
 @Injectable()
@@ -25,6 +26,7 @@ export class GetCliente {
       id: cliente.id,
       nome: cliente.nome,
       documento: cliente.documento.value,
+      email: cliente.email,
     }
   }
 }

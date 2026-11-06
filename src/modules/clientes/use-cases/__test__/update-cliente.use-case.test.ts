@@ -19,17 +19,19 @@ describe('UpdateCliente', () => {
     await repository.save(maria)
   })
 
-  it('salva o cliente com o documento e o nome informados', async () => {
+  it('salva o cliente com o documento, o nome e o e-mail informados', async () => {
     await updateCliente.execute({
       clienteId: maria.id,
       documento: '111.444.777-35',
       nome: 'Maria Souza',
+      email: 'maria.souza@email.com',
     })
 
     const salvo = await repository.findById(maria.id)
 
     expect(salvo?.documento.value).toBe('11144477735')
     expect(salvo?.nome).toBe('Maria Souza')
+    expect(salvo?.email).toBe('maria.souza@email.com')
   })
 
   it('aceita manter o próprio documento', async () => {
@@ -38,6 +40,7 @@ describe('UpdateCliente', () => {
         clienteId: maria.id,
         documento: '529.982.247-25',
         nome: 'Maria Souza',
+        email: 'maria@email.com',
       }),
     ).resolves.toBeUndefined()
   })
@@ -53,6 +56,7 @@ describe('UpdateCliente', () => {
         clienteId: maria.id,
         documento: '111.444.777-35',
         nome: 'Maria Silva',
+        email: 'maria@email.com',
       }),
     ).rejects.toThrow(ConflictError)
   })
@@ -63,6 +67,7 @@ describe('UpdateCliente', () => {
         clienteId: '6f1d3c2a-8b4e-4f7a-9c1d-2e3f4a5b6c7d',
         documento: '529.982.247-25',
         nome: 'Maria Silva',
+        email: 'maria@email.com',
       }),
     ).rejects.toThrow(NotFoundError)
   })

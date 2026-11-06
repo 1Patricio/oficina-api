@@ -73,7 +73,7 @@ describe('GET /clientes', () => {
     await app.close()
   })
 
-  it('responde 200 com a página pedida e o documento em texto', async () => {
+  it('responde 200 com a página pedida, o documento em texto e o e-mail', async () => {
     await repository.save(
       Cliente.create(Documento.create('111.444.777-35'), 'João Souza', 'joao@email.com'),
     )
@@ -92,7 +92,9 @@ describe('GET /clientes', () => {
       page: 2,
       rpp: 1,
       more: false,
-      list: [{ id: maria.id, nome: 'Maria Silva', documento: '52998224725' }],
+      list: [
+        { id: maria.id, nome: 'Maria Silva', documento: '52998224725', email: 'maria@email.com' },
+      ],
     })
   })
 })
@@ -121,7 +123,7 @@ describe('GET /clientes/:id', () => {
     await app.close()
   })
 
-  it('responde 200 com o cliente e o documento em texto', async () => {
+  it('responde 200 com o cliente, o documento em texto e o e-mail', async () => {
     const maria = Cliente.create(
       Documento.create('529.982.247-25'),
       'Maria Silva',
@@ -132,7 +134,12 @@ describe('GET /clientes/:id', () => {
     const response = await request(app.getHttpServer()).get(`/clientes/${maria.id}`)
 
     expect(response.status).toBe(200)
-    expect(response.body).toEqual({ id: maria.id, nome: 'Maria Silva', documento: '52998224725' })
+    expect(response.body).toEqual({
+      id: maria.id,
+      nome: 'Maria Silva',
+      documento: '52998224725',
+      email: 'maria@email.com',
+    })
   })
 
   it('responde 404 quando o cliente não existe', async () => {
@@ -181,10 +188,12 @@ describe('PUT /clientes/:id', () => {
     const response = await request(app.getHttpServer()).put(`/clientes/${maria.id}`).send({
       documento: '529.982.247-25',
       nome: 'Maria Souza',
+      email: 'maria.souza@email.com',
     })
 
     expect(response.status).toBe(204)
     expect(maria.nome).toBe('Maria Souza')
+    expect(maria.email).toBe('maria.souza@email.com')
   })
 })
 

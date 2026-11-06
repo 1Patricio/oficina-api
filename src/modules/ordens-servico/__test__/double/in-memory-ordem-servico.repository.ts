@@ -12,6 +12,7 @@ export class InMemoryOrdemServicoRepository extends OrdemServicoRepository {
   }
 
   save(ordem: OrdemServico): Promise<void> {
+    if (!this.itens.has(ordem.id)) ordem.atribuirNumero(this.itens.size + 1)
     this.itens.set(ordem.id, ordem)
     return Promise.resolve()
   }

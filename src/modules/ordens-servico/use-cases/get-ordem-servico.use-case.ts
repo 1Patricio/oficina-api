@@ -10,6 +10,7 @@ type Request = {
 
 type Response = {
   id: string
+  numero: number
   clienteId: string
   veiculoId: string
   status: StatusOrdemServico
@@ -45,6 +46,7 @@ export class GetOrdemServico {
 
     return {
       id: ordem.id,
+      numero: ordem.numero,
       clienteId: ordem.clienteId,
       veiculoId: ordem.veiculoId,
       status: ordem.status,

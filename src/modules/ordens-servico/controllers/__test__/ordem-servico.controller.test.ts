@@ -20,9 +20,11 @@ import { Servico } from '../../../servicos/domain/servico'
 import { InMemoryVeiculoRepository } from '../../../veiculos/__test__/double/in-memory-veiculo.repository'
 import { VeiculoRepository } from '../../../veiculos/domain/repositories/veiculo.repository'
 import { Veiculo } from '../../../veiculos/domain/veiculo'
+import { InMemoryNotificadorOrcamento } from '../../__test__/double/in-memory-notificador-orcamento'
 import { InMemoryOrdemServicoRepository } from '../../__test__/double/in-memory-ordem-servico.repository'
 import { ItemMaterial } from '../../domain/item-material'
 import { ItemServico } from '../../domain/item-servico'
+import { NotificadorOrcamento } from '../../domain/notificadores/notificador-orcamento'
 import { OrdemServico } from '../../domain/ordem-servico'
 import { OrdemServicoRepository } from '../../domain/repositories/ordem-servico.repository'
 import { StatusOrcamento } from '../../domain/status-orcamento'
@@ -176,6 +178,7 @@ describe('GET /ordens-servico', () => {
       list: [
         {
           id: segunda.id,
+          numero: 2,
           clienteId,
           veiculoId,
           status: StatusOrdemServico.AGUARDANDO_APROVACAO,
@@ -241,6 +244,7 @@ describe('GET /ordens-servico/:id', () => {
     expect(response.status).toBe(200)
     expect(response.body).toEqual({
       id: ordem.id,
+      numero: 1,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.AGUARDANDO_APROVACAO,
@@ -333,9 +337,28 @@ describe('POST /ordens-servico/:id/iniciar-diagnostico', () => {
 describe('POST /ordens-servico/:id/enviar-orcamento', () => {
   let app: INestApplication
   let repository: InMemoryOrdemServicoRepository
+  let notificador: InMemoryNotificadorOrcamento
+  let ordem: OrdemServico
 
   beforeEach(async () => {
     repository = new InMemoryOrdemServicoRepository()
+    notificador = new InMemoryNotificadorOrcamento()
+    const clienteRepository = new InMemoryClienteRepository()
+    const veiculoRepository = new InMemoryVeiculoRepository()
+    await veiculoRepository.save(
+      Veiculo.restore(veiculoId, Placa.create('ABC1D23'), 2018, 'Fiat', 'Uno', null, null),
+    )
+    const cliente = Cliente.create(
+      Documento.create('52998224725'),
+      'Maria Silva',
+      'maria@email.com',
+    )
+    await clienteRepository.save(cliente)
+
+    ordem = OrdemServico.create(cliente.id, veiculoId)
+    ordem.incluirServico(ItemServico.create(servicoId, 'Troca de óleo', Dinheiro.fromReais(150)))
+    ordem.iniciarDiagnostico()
+    await repository.save(ordem)
 
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
@@ -344,6 +367,12 @@ describe('POST /ordens-servico/:id/enviar-orcamento', () => {
       .useValue({})
       .overrideProvider(OrdemServicoRepository)
       .useValue(repository)
+      .overrideProvider(ClienteRepository)
+      .useValue(clienteRepository)
+      .overrideProvider(VeiculoRepository)
+      .useValue(veiculoRepository)
+      .overrideProvider(NotificadorOrcamento)
+      .useValue(notificador)
       .compile()
 
     app = moduleRef.createNestApplication()
@@ -354,12 +383,7 @@ describe('POST /ordens-servico/:id/enviar-orcamento', () => {
     await app.close()
   })
 
-  it('responde 204 e deixa a ordem aguardando aprovação com o orçamento enviado', async () => {
-    const ordem = OrdemServico.create(clienteId, veiculoId)
-    ordem.incluirServico(ItemServico.create(servicoId, 'Troca de óleo', Dinheiro.fromReais(150)))
-    ordem.iniciarDiagnostico()
-    await repository.save(ordem)
-
+  it('responde 204, deixa a ordem aguardando aprovação e avisa o cliente', async () => {
     const response = await request(app.getHttpServer()).post(
       `/ordens-servico/${ordem.id}/enviar-orcamento`,
     )
@@ -367,6 +391,79 @@ describe('POST /ordens-servico/:id/enviar-orcamento', () => {
     expect(response.status).toBe(204)
     expect(ordem.status).toBe(StatusOrdemServico.AGUARDANDO_APROVACAO)
     expect(ordem.orcamentos.map((orcamento) => orcamento.valor.reais)).toEqual([150])
+    expect(notificador.notificacoes.map((notificacao) => notificacao.email)).toEqual([
+      'maria@email.com',
+    ])
+  })
+
+  it('responde 502 quando o e-mail falha e mantém a ordem aguardando aprovação', async () => {
+    notificador.falhando = true
+
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/enviar-orcamento`,
+    )
+
+    expect(response.status).toBe(502)
+    expect(ordem.status).toBe(StatusOrdemServico.AGUARDANDO_APROVACAO)
+  })
+})
+
+describe('POST /ordens-servico/:id/reenviar-orcamento', () => {
+  let app: INestApplication
+  let notificador: InMemoryNotificadorOrcamento
+  let ordem: OrdemServico
+
+  beforeEach(async () => {
+    const repository = new InMemoryOrdemServicoRepository()
+    notificador = new InMemoryNotificadorOrcamento()
+    const clienteRepository = new InMemoryClienteRepository()
+    const veiculoRepository = new InMemoryVeiculoRepository()
+    await veiculoRepository.save(
+      Veiculo.restore(veiculoId, Placa.create('ABC1D23'), 2018, 'Fiat', 'Uno', null, null),
+    )
+    const cliente = Cliente.create(
+      Documento.create('52998224725'),
+      'Maria Silva',
+      'maria@email.com',
+    )
+    await clienteRepository.save(cliente)
+
+    ordem = OrdemServico.create(cliente.id, veiculoId)
+    ordem.incluirServico(ItemServico.create(servicoId, 'Troca de óleo', Dinheiro.fromReais(150)))
+    ordem.iniciarDiagnostico()
+    ordem.enviarOrcamento()
+    await repository.save(ordem)
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .overrideProvider(OrdemServicoRepository)
+      .useValue(repository)
+      .overrideProvider(ClienteRepository)
+      .useValue(clienteRepository)
+      .overrideProvider(VeiculoRepository)
+      .useValue(veiculoRepository)
+      .overrideProvider(NotificadorOrcamento)
+      .useValue(notificador)
+      .compile()
+
+    app = moduleRef.createNestApplication()
+    await app.init()
+  })
+
+  afterEach(async () => {
+    await app.close()
+  })
+
+  it('responde 204 e envia de novo o orçamento ao cliente', async () => {
+    const response = await request(app.getHttpServer()).post(
+      `/ordens-servico/${ordem.id}/reenviar-orcamento`,
+    )
+
+    expect(response.status).toBe(204)
+    expect(notificador.notificacoes.map((notificacao) => notificacao.valor.reais)).toEqual([150])
   })
 })
 

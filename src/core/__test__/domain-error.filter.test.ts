@@ -2,6 +2,7 @@ import type { ArgumentsHost } from '@nestjs/common'
 import { ConflictError } from '../../shared/domain/conflict-error'
 import { DomainError } from '../../shared/domain/domain-error'
 import { NotFoundError } from '../../shared/domain/not-found-error'
+import { NotificacaoError } from '../../shared/domain/notificacao-error'
 import { DomainErrorFilter } from '../domain-error.filter'
 
 function createContext() {
@@ -50,6 +51,19 @@ describe('DomainErrorFilter', () => {
       statusCode: 409,
       error: 'Conflict',
       message: 'Cliente já cadastrado.',
+    })
+  })
+
+  it('responde 502 com a mensagem para um erro de notificação', () => {
+    const { response, context } = createContext()
+
+    new DomainErrorFilter().catch(new NotificacaoError('E-mail não enviado.'), context)
+
+    expect(response.status).toHaveBeenCalledWith(502)
+    expect(response.json).toHaveBeenCalledWith({
+      statusCode: 502,
+      error: 'Bad Gateway',
+      message: 'E-mail não enviado.',
     })
   })
 })

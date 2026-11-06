@@ -18,6 +18,7 @@ type Request = {
 
 type Response = {
   id: string
+  numero: number
   status: StatusOrdemServico
   dataRecebimento: Date
   dataInicio: Date | null
@@ -57,6 +58,7 @@ export class ListOrdensServicoPublic {
 
     return ordens.map((ordem) => ({
       id: ordem.id,
+      numero: ordem.numero,
       status: ordem.status,
       dataRecebimento: ordem.dataRecebimento,
       dataInicio: ordem.dataInicio,

@@ -59,6 +59,7 @@ describe('ListOrdensServicoPublic', () => {
     expect(ordens.list).toEqual([
       {
         id: ordem.id,
+        numero: 1,
         status: StatusOrdemServico.AGUARDANDO_APROVACAO,
         dataRecebimento: new Date('2026-10-01T10:00:00Z'),
         dataInicio: null,

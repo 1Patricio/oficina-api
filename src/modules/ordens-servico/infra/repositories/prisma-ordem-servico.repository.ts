@@ -61,7 +61,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
       dataResposta,
     }))
 
-    await this.client.ordemServico.upsert({
+    const { numero } = await this.client.ordemServico.upsert({
       where: { id: ordem.id },
       create: {
         id: ordem.id,
@@ -77,6 +77,7 @@ export class PrismaOrdemServicoRepository implements OrdemServicoRepository {
         orcamentos: { deleteMany: {}, create: orcamentos },
       },
     })
+    ordem.atribuirNumero(numero)
   }
 
   async findById(id: string): Promise<OrdemServico | null> {
@@ -147,6 +148,7 @@ function toDomain(
 ): OrdemServico {
   return OrdemServico.restore({
     id: ordem.id,
+    numero: ordem.numero,
     clienteId: ordem.clienteId,
     veiculoId: ordem.veiculoId,
     status: StatusOrdemServico[ordem.status],

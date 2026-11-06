@@ -44,6 +44,7 @@ const transicoesInvalidas: [string, (ordem: OrdemServico) => void][] = [
     },
   ],
   ['enviar o orçamento antes do diagnóstico', (ordem) => ordem.enviarOrcamento()],
+  ['reenviar o orçamento antes de enviá-lo', (ordem) => ordem.reenviarOrcamento()],
   ['aprovar o orçamento antes de enviá-lo', (ordem) => ordem.aprovarOrcamento()],
   ['rejeitar o orçamento antes de enviá-lo', (ordem) => ordem.rejeitarOrcamento()],
   ['finalizar sem ter executado', (ordem) => ordem.finalizar()],
@@ -132,6 +133,13 @@ describe('OrdemServico', () => {
     expect(ordem.orcamentos[0].valor.cents).toBe(15000)
   })
 
+  it('reenvia o orçamento pendente sem mudar o status', () => {
+    const ordem = ordemAguardandoAprovacao()
+
+    expect(ordem.reenviarOrcamento()).toBe(ordem.orcamentos[0])
+    expect(ordem.status).toBe(StatusOrdemServico.AGUARDANDO_APROVACAO)
+  })
+
   it('aprova o orçamento e inicia a execução', () => {
     const ordem = ordemAguardandoAprovacao()
 
@@ -208,6 +216,7 @@ describe('OrdemServico', () => {
 
     const ordem = OrdemServico.restore({
       id,
+      numero: 7,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.EXECUCAO,
@@ -222,6 +231,7 @@ describe('OrdemServico', () => {
 
     expect(ordem).toMatchObject({
       id,
+      numero: 7,
       clienteId,
       veiculoId,
       status: StatusOrdemServico.EXECUCAO,

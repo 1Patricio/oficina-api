@@ -10,6 +10,7 @@ import { GetTempoMedio } from '../use-cases/get-tempo-medio.use-case'
 import { IncluirItens } from '../use-cases/incluir-itens.use-case'
 import { IniciarDiagnostico } from '../use-cases/iniciar-diagnostico.use-case'
 import { ListOrdemServico } from '../use-cases/list-ordem-servico.use-case'
+import { ReenviarOrcamento } from '../use-cases/reenviar-orcamento.use-case'
 import { RejeitarOrcamento } from '../use-cases/rejeitar-orcamento.use-case'
 import { CreateOrdemServicoDTO } from './dtos/create-ordem-servico.dto'
 import { IncluirItensDTO } from './dtos/incluir-itens.dto'
@@ -37,6 +38,9 @@ export class OrdemServicoController {
 
   @Inject()
   private readonly enviarOrcamento: EnviarOrcamento
+
+  @Inject()
+  private readonly reenviarOrcamento: ReenviarOrcamento
 
   @Inject()
   private readonly aprovarOrcamento: AprovarOrcamento
@@ -86,6 +90,12 @@ export class OrdemServicoController {
   @HttpCode(204)
   enviar(@Param('id', ParseIdPipe) ordemServicoId: string) {
     return this.enviarOrcamento.execute({ ordemServicoId })
+  }
+
+  @Post('/:id/reenviar-orcamento')
+  @HttpCode(204)
+  reenviar(@Param('id', ParseIdPipe) ordemServicoId: string) {
+    return this.reenviarOrcamento.execute({ ordemServicoId })
   }
 
   @Post('/:id/aprovar-orcamento')

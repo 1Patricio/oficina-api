@@ -54,6 +54,16 @@ model Cliente {
   @@map("clientes")
 }
 
+model Usuario {
+  id        String   @id @db.Uuid
+  nome      String
+  email     String   @unique
+  senha     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("usuarios")
+}
+
 model Servico {
   id            String    @id @db.Uuid
   nome          String

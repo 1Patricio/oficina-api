@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateServico } from '../use-cases/create-servico.use-case'
@@ -22,6 +23,8 @@ import { CreateServicoDTO } from './dtos/create-servico.dto'
 import { ListServicosQueryDTO } from './dtos/list-servicos-query.dto'
 import { UpdateServicoDTO } from './dtos/update-servico.dto'
 
+@ApiTags('Serviços')
+@ApiBearerAuth()
 @Controller('/servicos')
 @UseGuards(JwtAuthGuard)
 export class ServicoController {

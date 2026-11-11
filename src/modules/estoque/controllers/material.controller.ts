@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateMaterial } from '../use-cases/create-material.use-case'
@@ -24,6 +25,8 @@ import { ListMateriaisQueryDTO } from './dtos/list-materiais-query.dto'
 import { ReporEstoqueDTO } from './dtos/repor-estoque.dto'
 import { UpdateMaterialDTO } from './dtos/update-material.dto'
 
+@ApiTags('Estoque')
+@ApiBearerAuth()
 @Controller('/materiais')
 @UseGuards(JwtAuthGuard)
 export class MaterialController {

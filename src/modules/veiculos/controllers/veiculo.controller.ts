@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateVeiculo } from '../use-cases/create-veiculo.use-case'
@@ -22,6 +23,8 @@ import { CreateVeiculoDTO } from './dtos/create-veiculo.dto'
 import { ListVeiculosQueryDTO } from './dtos/list-veiculos-query.dto'
 import { UpdateVeiculoDTO } from './dtos/update-veiculo.dto'
 
+@ApiTags('Veículos')
+@ApiBearerAuth()
 @Controller('/veiculos')
 @UseGuards(JwtAuthGuard)
 export class VeiculoController {

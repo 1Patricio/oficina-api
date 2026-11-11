@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { JwtAuthGuard } from '../../../../core/jwt-auth.guard'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { InMemoryMaterialRepository } from '../../../estoque/__test__/double/in-memory-material.repository'
 import { Material } from '../../../estoque/domain/material'
@@ -36,6 +37,8 @@ describe('POST /servicos', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ServicoRepository)
       .useValue(repository)
       .overrideProvider(MaterialRepository)
@@ -96,6 +99,8 @@ describe('GET /servicos', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ServicoRepository)
       .useValue(repository)
       .compile()
@@ -145,6 +150,8 @@ describe('GET /servicos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ServicoRepository)
       .useValue(repository)
       .compile()
@@ -195,6 +202,8 @@ describe('PUT /servicos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ServicoRepository)
       .useValue(repository)
       .overrideProvider(MaterialRepository)
@@ -237,6 +246,8 @@ describe('DELETE /servicos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ServicoRepository)
       .useValue(repository)
       .compile()

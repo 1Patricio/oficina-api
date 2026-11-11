@@ -9,7 +9,9 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common'
+import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateMaterial } from '../use-cases/create-material.use-case'
 import { DeleteMaterial } from '../use-cases/delete-material.use-case'
@@ -23,6 +25,7 @@ import { ReporEstoqueDTO } from './dtos/repor-estoque.dto'
 import { UpdateMaterialDTO } from './dtos/update-material.dto'
 
 @Controller('/materiais')
+@UseGuards(JwtAuthGuard)
 export class MaterialController {
   @Inject(CreateMaterial)
   private readonly createMaterial: CreateMaterial

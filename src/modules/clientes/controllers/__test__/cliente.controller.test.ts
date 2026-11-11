@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { JwtAuthGuard } from '../../../../core/jwt-auth.guard'
 import { Documento } from '../../../../shared/domain/documento'
 import { InMemoryClienteRepository } from '../../__test__/double/in-memory-cliente.repository'
 import { Cliente } from '../../domain/cliente'
@@ -26,6 +27,8 @@ describe('POST /clientes', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ClienteRepository)
       .useValue(repository)
       .compile()
@@ -61,6 +64,8 @@ describe('GET /clientes', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ClienteRepository)
       .useValue(repository)
       .compile()
@@ -111,6 +116,8 @@ describe('GET /clientes/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ClienteRepository)
       .useValue(repository)
       .compile()
@@ -164,6 +171,8 @@ describe('PUT /clientes/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ClienteRepository)
       .useValue(repository)
       .compile()
@@ -209,6 +218,8 @@ describe('DELETE /clientes/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(ClienteRepository)
       .useValue(repository)
       .compile()

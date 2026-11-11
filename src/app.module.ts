@@ -8,6 +8,7 @@ import { ClienteModule } from './modules/clientes/cliente.module'
 import { EstoqueModule } from './modules/estoque/estoque.module'
 import { OrdemServicoModule } from './modules/ordens-servico/ordem-servico.module'
 import { ServicoModule } from './modules/servicos/servico.module'
+import { UsuarioModule } from './modules/usuarios/usuario.module'
 import { VeiculoModule } from './modules/veiculos/veiculo.module'
 
 @Module({
@@ -19,6 +20,7 @@ import { VeiculoModule } from './modules/veiculos/veiculo.module'
     VeiculoModule,
     ServicoModule,
     OrdemServicoModule,
+    UsuarioModule,
   ],
   controllers: [PingController],
   providers: [

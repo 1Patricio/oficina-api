@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Inject,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
+import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { AprovarOrcamento } from '../use-cases/aprovar-orcamento.use-case'
 import { CreateOrdemServico } from '../use-cases/create-ordem-servico.use-case'
@@ -17,6 +28,7 @@ import { IncluirItensDTO } from './dtos/incluir-itens.dto'
 import { ListOrdensServicoQueryDTO } from './dtos/list-ordens-servico-query.dto'
 
 @Controller('/ordens-servico')
+@UseGuards(JwtAuthGuard)
 export class OrdemServicoController {
   @Inject(CreateOrdemServico)
   private readonly createOrdemServico: CreateOrdemServico

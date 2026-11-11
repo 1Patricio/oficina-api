@@ -5,6 +5,7 @@ import { AuthController } from './controllers/auth.controller'
 import { UsuarioRepository } from './domain/repositories/usuario.repository'
 import { PrismaUsuarioRepository } from './infra/repositories/prisma-usuario.repository'
 import { AuthenticateUsuario } from './use-cases/authenticate-usuario.use-case'
+import { CreateAdmin } from './use-cases/create-admin.use-case'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AuthenticateUsuario } from './use-cases/authenticate-usuario.use-case'
   providers: [
     { provide: UsuarioRepository, useClass: PrismaUsuarioRepository },
     AuthenticateUsuario,
+    CreateAdmin,
   ],
   exports: [UsuarioRepository],
 })

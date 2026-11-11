@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateCliente } from '../use-cases/create-cliente.use-case'
@@ -22,6 +23,8 @@ import { CreateClienteDTO } from './dtos/create-cliente.dto'
 import { ListClientesQueryDTO } from './dtos/list-clientes-query.dto'
 import { UpdateClienteDTO } from './dtos/update-cliente.dto'
 
+@ApiTags('Clientes')
+@ApiBearerAuth()
 @Controller('/clientes')
 @UseGuards(JwtAuthGuard)
 export class ClienteController {

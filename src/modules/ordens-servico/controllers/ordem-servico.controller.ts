@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { AprovarOrcamento } from '../use-cases/aprovar-orcamento.use-case'
@@ -27,6 +28,8 @@ import { CreateOrdemServicoDTO } from './dtos/create-ordem-servico.dto'
 import { IncluirItensDTO } from './dtos/incluir-itens.dto'
 import { ListOrdensServicoQueryDTO } from './dtos/list-ordens-servico-query.dto'
 
+@ApiTags('Ordens de serviço')
+@ApiBearerAuth()
 @Controller('/ordens-servico')
 @UseGuards(JwtAuthGuard)
 export class OrdemServicoController {
@@ -67,6 +70,7 @@ export class OrdemServicoController {
   private readonly entregarOrdemServico: EntregarOrdemServico
 
   @Post('/')
+  @ApiOperation({ summary: 'Abre uma ordem de serviço para um veículo' })
   create(@Body() ordemServico: CreateOrdemServicoDTO) {
     return this.createOrdemServico.execute(ordemServico)
   }
@@ -100,6 +104,7 @@ export class OrdemServicoController {
 
   @Post('/:id/enviar-orcamento')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Envia o orçamento ao cliente por e-mail' })
   enviar(@Param('id', ParseIdPipe) ordemServicoId: string) {
     return this.enviarOrcamento.execute({ ordemServicoId })
   }
@@ -112,6 +117,7 @@ export class OrdemServicoController {
 
   @Post('/:id/aprovar-orcamento')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Aprova o orçamento e baixa os materiais do estoque' })
   aprovar(@Param('id', ParseIdPipe) ordemServicoId: string) {
     return this.aprovarOrcamento.execute({ ordemServicoId })
   }

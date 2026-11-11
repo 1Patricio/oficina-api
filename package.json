@@ -17,8 +17,7 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "dev": "nest start --watch"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",

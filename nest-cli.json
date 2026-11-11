@@ -5,6 +5,7 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "tsConfigPath": "tsconfig.build.json",
-    "assets": ["**/*.ejs"]
+    "assets": ["**/*.ejs"],
+    "plugins": ["@nestjs/swagger"]
   }
 }

@@ -16,7 +16,11 @@ export class Usuario extends Entity {
   }
 
   static create(nome: string, email: string, senha: string): Usuario {
-    return new Usuario(randomUUID(), nome, email.trim().toLowerCase(), senha)
+    return new Usuario(randomUUID(), nome, Usuario.normalizeEmail(email), senha)
+  }
+
+  static normalizeEmail(email: string): string {
+    return email.trim().toLowerCase()
   }
 
   static restore(id: string, nome: string, email: string, senha: string): Usuario {

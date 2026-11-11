@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import bcryptjs from 'bcryptjs'
 import { UsuarioRepository } from '../domain/repositories/usuario.repository'
+import { Usuario } from '../domain/usuario'
 
 type Request = {
   email: string
@@ -20,7 +21,7 @@ export class AuthenticateUsuario {
   ) {}
 
   async execute({ email, senha }: Request): Promise<Response> {
-    const usuario = await this.usuarioRepository.findByEmail(email.trim().toLowerCase())
+    const usuario = await this.usuarioRepository.findByEmail(Usuario.normalizeEmail(email))
 
     if (!usuario) {
       throw new UnauthorizedException('E-mail/senha incorretos.')

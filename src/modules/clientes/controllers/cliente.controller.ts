@@ -9,7 +9,9 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common'
+import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateCliente } from '../use-cases/create-cliente.use-case'
 import { DeleteCliente } from '../use-cases/delete-cliente.use-case'
@@ -21,6 +23,7 @@ import { ListClientesQueryDTO } from './dtos/list-clientes-query.dto'
 import { UpdateClienteDTO } from './dtos/update-cliente.dto'
 
 @Controller('/clientes')
+@UseGuards(JwtAuthGuard)
 export class ClienteController {
   @Inject(CreateCliente)
   private readonly createCliente: CreateCliente

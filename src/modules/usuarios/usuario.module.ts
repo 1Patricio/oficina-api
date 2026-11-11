@@ -10,6 +10,7 @@ import { CreateAdmin } from './use-cases/create-admin.use-case'
 @Module({
   imports: [
     JwtModule.registerAsync({
+      global: true,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow('JWT_SECRET'),

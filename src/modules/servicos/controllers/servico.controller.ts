@@ -9,7 +9,9 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common'
+import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateServico } from '../use-cases/create-servico.use-case'
 import { DeleteServico } from '../use-cases/delete-servico.use-case'
@@ -21,6 +23,7 @@ import { ListServicosQueryDTO } from './dtos/list-servicos-query.dto'
 import { UpdateServicoDTO } from './dtos/update-servico.dto'
 
 @Controller('/servicos')
+@UseGuards(JwtAuthGuard)
 export class ServicoController {
   @Inject(CreateServico)
   private readonly createServico: CreateServico

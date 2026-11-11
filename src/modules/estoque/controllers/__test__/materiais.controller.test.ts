@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { JwtAuthGuard } from '../../../../core/jwt-auth.guard'
 import { InMemoryTransactionManager } from '../../../../shared/__test__/double/in-memory-transaction-manager'
 import { Dinheiro } from '../../../../shared/domain/dinheiro'
 import { TransactionManager } from '../../../../shared/domain/transaction-manager'
@@ -28,6 +29,8 @@ describe('POST /materiais', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .compile()
@@ -103,6 +106,8 @@ describe('GET /materiais', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .compile()
@@ -157,6 +162,8 @@ describe('GET /materiais/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .compile()
@@ -207,6 +214,8 @@ describe('PUT /materiais/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .compile()
@@ -247,6 +256,8 @@ describe('DELETE /materiais/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .compile()
@@ -283,6 +294,8 @@ describe('POST /materiais/:id/reposicao', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(MaterialRepository)
       .useValue(repository)
       .overrideProvider(TransactionManager)

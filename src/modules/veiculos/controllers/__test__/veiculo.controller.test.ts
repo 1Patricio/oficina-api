@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { AppModule } from '../../../../app.module'
 import { PrismaService } from '../../../../core/database/prisma.service'
+import { JwtAuthGuard } from '../../../../core/jwt-auth.guard'
 import { Documento } from '../../../../shared/domain/documento'
 import { Placa } from '../../../../shared/domain/placa'
 import { InMemoryClienteRepository } from '../../../clientes/__test__/double/in-memory-cliente.repository'
@@ -33,6 +34,8 @@ describe('POST /veiculos', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(VeiculoRepository)
       .useValue(repository)
       .overrideProvider(ClienteRepository)
@@ -137,6 +140,8 @@ describe('GET /veiculos', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(VeiculoRepository)
       .useValue(repository)
       .compile()
@@ -187,6 +192,8 @@ describe('GET /veiculos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(VeiculoRepository)
       .useValue(repository)
       .compile()
@@ -238,6 +245,8 @@ describe('PUT /veiculos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(VeiculoRepository)
       .useValue(repository)
       .compile()
@@ -276,6 +285,8 @@ describe('DELETE /veiculos/:id', () => {
     })
       .overrideProvider(PrismaService)
       .useValue({})
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
       .overrideProvider(VeiculoRepository)
       .useValue(repository)
       .compile()

@@ -9,7 +9,9 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common'
+import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { CreateVeiculo } from '../use-cases/create-veiculo.use-case'
 import { DeleteVeiculo } from '../use-cases/delete-veiculo.use-case'
@@ -21,6 +23,7 @@ import { ListVeiculosQueryDTO } from './dtos/list-veiculos-query.dto'
 import { UpdateVeiculoDTO } from './dtos/update-veiculo.dto'
 
 @Controller('/veiculos')
+@UseGuards(JwtAuthGuard)
 export class VeiculoController {
   @Inject(CreateVeiculo)
   private readonly createVeiculo: CreateVeiculo

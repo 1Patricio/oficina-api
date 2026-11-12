@@ -12,7 +12,9 @@ import { OrdemServicoRepository } from './domain/repositories/ordem-servico.repo
 import { SmtpNotificadorOrcamento } from './infra/notificadores/smtp-notificador-orcamento'
 import { PrismaOrdemServicoRepository } from './infra/repositories/prisma-ordem-servico.repository'
 import { AprovarOrcamento } from './use-cases/aprovar-orcamento.use-case'
+import { AprovarOrcamentoPublic } from './use-cases/aprovar-orcamento-public.use-case'
 import { CreateOrdemServico } from './use-cases/create-ordem-servico.use-case'
+import { EnsureOrdemServicoCliente } from './use-cases/ensure-ordem-servico-cliente'
 import { EntregarOrdemServico } from './use-cases/entregar-ordem-servico.use-case'
 import { EnviarOrcamento } from './use-cases/enviar-orcamento.use-case'
 import { FinalizarOrdemServico } from './use-cases/finalizar-ordem-servico.use-case'
@@ -25,6 +27,7 @@ import { ListOrdensServicoPublic } from './use-cases/list-ordens-servico-public.
 import { NotificarOrcamentoCliente } from './use-cases/notificar-orcamento-cliente'
 import { ReenviarOrcamento } from './use-cases/reenviar-orcamento.use-case'
 import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
+import { RejeitarOrcamentoPublic } from './use-cases/rejeitar-orcamento-public.use-case'
 
 @Module({
   imports: [ClienteModule, VeiculoModule, ServicoModule, EstoqueModule],
@@ -55,6 +58,9 @@ import { RejeitarOrcamento } from './use-cases/rejeitar-orcamento.use-case'
     ReenviarOrcamento,
     AprovarOrcamento,
     RejeitarOrcamento,
+    EnsureOrdemServicoCliente,
+    AprovarOrcamentoPublic,
+    RejeitarOrcamentoPublic,
     FinalizarOrdemServico,
     EntregarOrdemServico,
   ],

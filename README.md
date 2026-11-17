@@ -168,4 +168,4 @@ npm run typecheck       # TypeScript
 
 ## Análise de vulnerabilidades
 
-O `npm audit` de produção (`npm audit --omit=dev`) não aponta nenhuma vulnerabilidade. O audit completo aponta 11 moderadas, todas em dependências de desenvolvimento (Vitest, `@nestjs/cli` e `@testcontainers/postgresql`), que não vão para a imagem Docker. O relatório com os avisos, a avaliação de risco e o tratamento está em [`docs/vulnerabilidades.md`](docs/vulnerabilidades.md).
+O `npm audit` de produção (`npm audit --omit=dev`) não aponta nenhuma vulnerabilidade. O audit completo aponta 3 moderadas, todas em dependências de desenvolvimento (`@nestjs/cli`, `glob` e `minimatch`), que não vão para a imagem Docker. O relatório com os avisos, a avaliação de risco e o tratamento está em [`docs/vulnerabilidades.md`](docs/vulnerabilidades.md).

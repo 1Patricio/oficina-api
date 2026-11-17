@@ -9,7 +9,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../core/jwt-auth.guard'
 import { ParseIdPipe } from '../../../core/parse-id.pipe'
 import { AprovarOrcamento } from '../use-cases/aprovar-orcamento.use-case'
@@ -27,6 +33,12 @@ import { RejeitarOrcamento } from '../use-cases/rejeitar-orcamento.use-case'
 import { CreateOrdemServicoDTO } from './dtos/create-ordem-servico.dto'
 import { IncluirItensDTO } from './dtos/incluir-itens.dto'
 import { ListOrdensServicoQueryDTO } from './dtos/list-ordens-servico-query.dto'
+import {
+  CreateOrdemServicoResponseDTO,
+  ListOrdensServicoResponseDTO,
+  OrdemServicoResponseDTO,
+  TempoMedioResponseDTO,
+} from './dtos/ordem-servico-response.dto'
 
 @ApiTags('Ordens de serviço')
 @ApiBearerAuth()
@@ -71,21 +83,25 @@ export class OrdemServicoController {
 
   @Post('/')
   @ApiOperation({ summary: 'Abre uma ordem de serviço para um veículo' })
+  @ApiCreatedResponse({ type: CreateOrdemServicoResponseDTO })
   create(@Body() ordemServico: CreateOrdemServicoDTO) {
     return this.createOrdemServico.execute(ordemServico)
   }
 
   @Get('/')
+  @ApiOkResponse({ type: ListOrdensServicoResponseDTO })
   list(@Query() query: ListOrdensServicoQueryDTO) {
     return this.listOrdemServico.execute(query)
   }
 
   @Get('/tempo-medio')
+  @ApiOkResponse({ type: TempoMedioResponseDTO })
   tempoMedio() {
     return this.getTempoMedio.execute()
   }
 
   @Get('/:id')
+  @ApiOkResponse({ type: OrdemServicoResponseDTO })
   get(@Param('id', ParseIdPipe) ordemServicoId: string) {
     return this.getOrdemServico.execute({ ordemServicoId })
   }

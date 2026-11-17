@@ -9,6 +9,7 @@ describe('SmtpNotificadorOrcamento', () => {
     const notificador = new SmtpNotificadorOrcamento(transporter, 'oficina@oficina.local')
 
     await notificador.notificar({
+      id: 'a1b2c3d4-0000-4000-8000-000000000007',
       email: 'maria@email.com',
       nome: 'Maria Silva',
       numero: 7,
@@ -34,6 +35,32 @@ describe('SmtpNotificadorOrcamento', () => {
             'Total: R$ 150,00',
           ].join('\n'),
         ),
+      }),
+    )
+  })
+
+  it('Deve ensinar o cliente a aprovar ou rejeitar o orçamento com o id da ordem de serviço', async () => {
+    const transporter = createTransport({ jsonTransport: true })
+    const sendMail = vi.spyOn(transporter, 'sendMail')
+    const notificador = new SmtpNotificadorOrcamento(transporter, 'oficina@oficina.local')
+
+    await notificador.notificar({
+      id: 'a1b2c3d4-0000-4000-8000-000000000007',
+      email: 'maria@email.com',
+      nome: 'Maria Silva',
+      numero: 7,
+      veiculo: { placa: 'ABC1D23', marca: 'Fiat', modelo: 'Uno', ano: 2018 },
+      servicos: [],
+      materiais: [],
+      valor: Dinheiro.fromReais(0),
+    })
+
+    const rota = '/public/ordens-servico/a1b2c3d4-0000-4000-8000-000000000007'
+    const rotas = [`${rota}/aprovar-orcamento`, `${rota}/rejeitar-orcamento`]
+    expect(sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringMatching(new RegExp(rotas.join('[\\s\\S]*'))),
+        text: expect.stringMatching(new RegExp(rotas.join('[\\s\\S]*'))),
       }),
     )
   })

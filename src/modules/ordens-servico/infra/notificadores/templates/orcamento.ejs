@@ -58,6 +58,13 @@
                   </tr>
                 </tfoot>
               </table>
+
+              <p style="margin: 24px 0 8px; font-size: 14px; font-weight: bold;">Como responder</p>
+              <p style="margin: 0 0 8px; font-size: 14px; line-height: 20px;">
+                Para aprovar ou rejeitar, envie uma requisição com o seu documento (<code>documento</code>) e a placa do veículo (<code>placa</code>) no corpo:
+              </p>
+              <p style="margin: 0 0 4px; font-size: 13px; font-family: monospace;">Aprovar: POST /public/ordens-servico/<%= id %>/aprovar-orcamento</p>
+              <p style="margin: 0; font-size: 13px; font-family: monospace;">Rejeitar: POST /public/ordens-servico/<%= id %>/rejeitar-orcamento</p>
             </td>
           </tr>
         </table>

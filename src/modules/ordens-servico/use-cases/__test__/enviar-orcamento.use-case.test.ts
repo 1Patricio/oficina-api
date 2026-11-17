@@ -61,6 +61,7 @@ describe('EnviarOrcamento', () => {
     expect(save).toHaveBeenCalledWith(ordem)
     expect(notificador.notificacoes).toEqual([
       {
+        id: ordem.id,
         email: 'maria@email.com',
         nome: 'Maria Silva',
         numero: 1,

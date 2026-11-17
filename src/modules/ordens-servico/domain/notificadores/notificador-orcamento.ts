@@ -1,6 +1,7 @@
 import type { Dinheiro } from '../../../../shared/domain/dinheiro'
 
 export type NotificacaoOrcamento = {
+  id: string
   email: string
   nome: string
   numero: number

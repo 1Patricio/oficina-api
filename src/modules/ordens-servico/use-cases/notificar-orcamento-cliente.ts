@@ -30,6 +30,7 @@ export class NotificarOrcamentoCliente {
 
     try {
       await this.notificadorOrcamento.notificar({
+        id: ordem.id,
         email: cliente.email,
         nome: cliente.nome,
         numero: ordem.numero,

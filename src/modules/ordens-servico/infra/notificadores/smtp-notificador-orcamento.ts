@@ -16,6 +16,7 @@ export class SmtpNotificadorOrcamento implements NotificadorOrcamento {
   ) {}
 
   async notificar({
+    id,
     email,
     nome,
     numero,
@@ -33,6 +34,7 @@ export class SmtpNotificadorOrcamento implements NotificadorOrcamento {
     )
 
     const html = await renderFile(template, {
+      id,
       nome,
       numero,
       veiculo,
@@ -68,6 +70,11 @@ export class SmtpNotificadorOrcamento implements NotificadorOrcamento {
         `Total: ${reais.format(valor.reais)}`,
         '',
         'Ele aguarda a sua aprovação para iniciarmos o serviço.',
+        '',
+        'Como responder:',
+        `- Aprovar: POST /public/ordens-servico/${id}/aprovar-orcamento`,
+        `- Rejeitar: POST /public/ordens-servico/${id}/rejeitar-orcamento`,
+        'Envie no corpo da requisição o seu documento (documento) e a placa do veículo (placa).',
       ].join('\n'),
     })
   }

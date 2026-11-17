@@ -3,7 +3,7 @@
 MVP do back-end do Sistema Integrado de Atendimento e Execução de Serviços de uma oficina mecânica, desenvolvido para o Tech Challenge da Fase 1 da pós-graduação FIAP SOAT (Software Architecture).
 
 - Grupo 67: Anderson Goularte Patricio (RM378389)
-- Vídeo de apresentação: _link do YouTube a incluir_
+- Vídeo de apresentação: [youtu.be/SsgkOYAQypY](https://youtu.be/SsgkOYAQypY)
 - Documentação DDD: [Event Storming](docs/ddd/event-storming.pdf), [diagramas](docs/ddd/diagramas.pdf) (UML, mapa de contextos e C4), [linguagem ubíqua](docs/ddd/linguagem-ubiqua.md) e o [board no Miro](https://miro.com/app/board/uXjVETvEsw4=/?share_link_id=103121745115)
 - Relatório de vulnerabilidades: [docs/vulnerabilidades.md](docs/vulnerabilidades.md)
 

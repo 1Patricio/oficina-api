@@ -5,7 +5,7 @@ MVP do back-end do Sistema Integrado de Atendimento e Execução de Serviços de
 - Grupo 67: Anderson Goularte Patricio (RM378389)
 - Vídeo de apresentação: _link do YouTube a incluir_
 - Documentação DDD: [Event Storming](docs/ddd/event-storming.pdf), [diagramas](docs/ddd/diagramas.pdf) (UML, mapa de contextos e C4), [linguagem ubíqua](docs/ddd/linguagem-ubiqua.md) e o [board no Miro](https://miro.com/app/board/uXjVETvEsw4=/)
-- Relatório de vulnerabilidades: _a incluir_
+- Relatório de vulnerabilidades: [docs/vulnerabilidades.md](docs/vulnerabilidades.md)
 
 ## Objetivo
 
@@ -35,11 +35,17 @@ src/
     ├── estoque/
     ├── ordens-servico/
     └── usuarios/
-        ├── domain/       # entidades, objetos de valor e contratos dos repositórios
-        ├── use-cases/    # um caso de uso por operação
-        ├── infra/        # repositórios com Prisma
-        ├── controllers/  # rotas, DTOs e documentação do Swagger
-        └── __test__/     # dublês de teste do módulo
+```
+
+Cada módulo tem a mesma divisão interna:
+
+```text
+<módulo>/
+├── domain/       # entidades, objetos de valor e contratos dos repositórios
+├── use-cases/    # um caso de uso por operação
+├── infra/        # repositórios com Prisma
+├── controllers/  # rotas, DTOs e documentação do Swagger
+└── __test__/     # dublês de teste do módulo
 ```
 
 O domínio não depende de NestJS nem de Prisma: os casos de uso falam com contratos de repositório, e a camada `infra` os implementa. Os testes ficam em `__test__` ao lado de cada camada.
@@ -140,9 +146,9 @@ O detalhe de cada rota (corpo, query e respostas) está no Swagger.
 ## Fluxo da ordem de serviço
 
 1. Com o cliente e o veículo já cadastrados, a equipe abre a ordem (`POST /ordens-servico`) com o documento do cliente, o veículo e, se quiser, serviços e materiais.
-2. Inicia o diagnóstico e inclui os itens necessários (serviços e materiais).
-3. Envia o orçamento. O cliente recebe o e-mail com o número da ordem, visível no Mailpit.
-4. O cliente consulta a ordem pela rota pública e aprova ou rejeita o orçamento, ou a equipe registra a resposta. A aprovação baixa o estoque.
+2. Inicia o diagnóstico e inclui os itens necessários (serviços e materiais). Os itens só podem ser alterados até o envio do orçamento.
+3. Envia o orçamento, que precisa ter ao menos um item. O cliente recebe o e-mail com o número da ordem, visível no Mailpit, e a ordem passa para `AGUARDANDO_APROVACAO`.
+4. O cliente consulta a ordem pela rota pública e aprova ou rejeita o orçamento, ou a equipe registra a resposta. A aprovação baixa o estoque e leva a ordem para `EXECUCAO`. A rejeição devolve a ordem para `DIAGNOSTICO`, onde os itens podem ser ajustados e o orçamento enviado de novo.
 5. A equipe finaliza a ordem e entrega o veículo.
 
 ## Testes
@@ -162,4 +168,4 @@ npm run typecheck       # TypeScript
 
 ## Análise de vulnerabilidades
 
-Relatório a incluir.
+O `npm audit` de produção (`npm audit --omit=dev`) não aponta nenhuma vulnerabilidade. O audit completo aponta 11 moderadas, todas em dependências de desenvolvimento (Vitest, `@nestjs/cli` e `@testcontainers/postgresql`), que não vão para a imagem Docker. O relatório com os avisos, a avaliação de risco e o tratamento está em [`docs/vulnerabilidades.md`](docs/vulnerabilidades.md).

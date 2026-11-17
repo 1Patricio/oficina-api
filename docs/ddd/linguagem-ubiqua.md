@@ -1,6 +1,6 @@
 # Linguagem ubíqua
 
-Termos do domínio da oficina e onde aparecem no código. Este glossário é o mesmo do [board do Miro](https://miro.com/app/board/uXjVETvEsw4=/).
+Termos do domínio da oficina e onde aparecem no código. Este glossário é o mesmo do [board do Miro](https://miro.com/app/board/uXjVETvEsw4=/?share_link_id=103121745115).
 
 | # | Termo | Significado | No código | Fonte |
 | --- | --- | --- | --- | --- |

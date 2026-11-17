@@ -4,7 +4,7 @@ MVP do back-end do Sistema Integrado de Atendimento e Execução de Serviços de
 
 - Grupo 67: Anderson Goularte Patricio (RM378389)
 - Vídeo de apresentação: _link do YouTube a incluir_
-- Documentação DDD: [Event Storming](docs/ddd/event-storming.pdf), [diagramas](docs/ddd/diagramas.pdf) (UML, mapa de contextos e C4), [linguagem ubíqua](docs/ddd/linguagem-ubiqua.md) e o [board no Miro](https://miro.com/app/board/uXjVETvEsw4=/)
+- Documentação DDD: [Event Storming](docs/ddd/event-storming.pdf), [diagramas](docs/ddd/diagramas.pdf) (UML, mapa de contextos e C4), [linguagem ubíqua](docs/ddd/linguagem-ubiqua.md) e o [board no Miro](https://miro.com/app/board/uXjVETvEsw4=/?share_link_id=103121745115)
 - Relatório de vulnerabilidades: [docs/vulnerabilidades.md](docs/vulnerabilidades.md)
 
 ## Objetivo
@@ -50,7 +50,7 @@ Cada módulo tem a mesma divisão interna:
 
 O domínio não depende de NestJS nem de Prisma: os casos de uso falam com contratos de repositório, e a camada `infra` os implementa. Os testes ficam em `__test__` ao lado de cada camada.
 
-A documentação DDD fica em `docs/ddd/`, exportada do [board do Miro](https://miro.com/app/board/uXjVETvEsw4=/):
+A documentação DDD fica em `docs/ddd/`, exportada do [board do Miro](https://miro.com/app/board/uXjVETvEsw4=/?share_link_id=103121745115):
 
 - [`event-storming.pdf`](docs/ddd/event-storming.pdf): os quatro Event Storming (criação da OS, gestão de peças e insumos, acompanhamento da OS e acesso da equipe) e a legenda.
 - [`diagramas.pdf`](docs/ddd/diagramas.pdf): diagrama de classes UML, mapa de contextos e modelo C4 (contexto, contêineres e componentes).
